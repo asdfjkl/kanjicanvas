@@ -1,0 +1,199 @@
+<meta charset="UTF-8">
+<html>
+<script type="text/javascript">
+  var canvas, ctx, flag = false,
+  prevX = 0,
+  currX = 0,
+  prevY = 0,
+  currY = 0,
+  dot_flag = false;
+
+  var recordedPattern = new Array();
+  var curentLine;
+
+  function init() {
+    canvas = document.getElementById('can');
+    ctx = canvas.getContext("2d");
+    w = canvas.width;
+    h = canvas.height;
+
+    canvas.addEventListener("mousemove", function (e) {
+      findxy('move', e)
+    }, false);
+    canvas.addEventListener("mousedown", function (e) {
+      findxy('down', e)
+    }, false);
+    canvas.addEventListener("mouseup", function (e) {
+      findxy('up', e)
+    }, false);
+    canvas.addEventListener("mouseout", function (e) {
+      findxy('out', e)
+    }, false);
+  }
+
+  function draw() {
+    ctx.beginPath();
+    ctx.moveTo(prevX, prevY);
+    ctx.lineTo(currX, currY);
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.closePath();
+  }
+
+  function deleteLast() {
+    ctx.clearRect(0, 0, w, h);
+    for(var i = 0;i<recordedPattern.length-1;i++) {
+      var stroke_i = recordedPattern[i];
+      for(var j = 0; j<stroke_i.length-1;j++) {
+        prevX = stroke_i[j][0];
+        prevY = stroke_i[j][1];
+
+        currX = stroke_i[j+1][0];
+        currY = stroke_i[j+1][1];
+        draw();
+      }
+    }
+    recordedPattern.pop();
+  }
+
+  function erase() {
+    ctx.clearRect(0, 0, w, h);
+    recordedPattern.length = 0;
+  }
+
+  function findxy(res, e) {
+    if (res == 'down') {
+      prevX = currX;
+      prevY = currY;
+      currX = e.clientX - canvas.offsetLeft;
+      currY = e.clientY - canvas.offsetTop;
+
+      currentLine = new Array();
+      currentLine.push([currX, currY]);
+
+      flag = true;
+      dot_flag = true;
+      if (dot_flag) {
+        ctx.beginPath();
+        ctx.fillRect(currX, currY, 2, 2);
+        ctx.closePath();
+        dot_flag = false;
+      }
+    }
+    if (res == 'up') {
+      flag = false;
+      recordedPattern.push(currentLine);
+    }
+
+    if (res == "out") {
+      flag = false;
+    }
+
+    if (res == 'move') {
+      if (flag) {
+        prevX = currX;
+        prevY = currY;
+        currX = e.clientX - canvas.offsetLeft;
+        currY = e.clientY - canvas.offsetTop;
+        currentLine.push([prevX, prevY]);
+        currentLine.push([currX, currY]);
+        draw();
+      }
+    }
+  }
+
+  function redraw() {
+    console.log(recordedPattern);
+
+      ctx.clearRect(0, 0, w, h);
+      for(var i = 0;i<recordedPattern.length;i++) {
+        var stroke_i = recordedPattern[i]
+        for(var j = 0; j<stroke_i.length-1;j++) {
+          prevX = stroke_i[j][0];
+          prevY = stroke_i[j][1];
+
+          currX = stroke_i[j+1][0];
+          currY = stroke_i[j+1][1];
+          console.log("currX");
+          draw();
+        }
+      }
+  }
+
+  function recognize() {
+    document.getElementById("candidateList").innerHTML = "日本";
+  }
+
+  // rasterize screen input by adding points
+  // using bresenhams line algorithm
+  function normalizeLinear() {
+    console.log("start");
+
+    var normalizedPattern = new Array();
+    newHeight = 256;
+    newWidth = 256;
+    xMin = 256;
+    xMax = 0;
+    yMin = 256;
+    yMax = 0;
+    // first determine drawn character width / length
+    for(var i = 0;i<recordedPattern.length;i++) {
+      var stroke_i = recordedPattern[i];
+      for(var j = 0; j<stroke_i.length;j++) {
+        x = stroke_i[j][0];
+        console.log(x);
+        y = stroke_i[j][1];
+        if(x < xMin) {
+          xMin = x;
+        }
+        if(x > xMax) {
+          xMax = x;
+        }
+        if(y < yMin) {
+          yMin = y;
+        }
+        if(y > yMax) {
+          yMax = y;
+        }
+      }
+    }
+    oldHeight = Math.abs(yMax - yMin);
+    oldWidth  = Math.abs(xMax - xMin);
+    if(oldHeight > oldWidth) {
+      oldWidth = oldHeight;
+    } else {
+      oldHeight = oldWidth;
+    }
+
+    normalizedPattern = new Array();
+    // normalize
+    for(var i = 0;i<recordedPattern.length;i++) {
+      var stroke_i = recordedPattern[i];
+      var normalized_stroke_i = new Array();
+      for(var j = 0; j<stroke_i.length;j++) {
+        x = stroke_i[j][0];
+        y = stroke_i[j][1];
+        xNorm = (x - xMin) * (newWidth / oldWidth) ;
+        yNorm = (y - yMin) * (newHeight / oldHeight);
+        normalized_stroke_i.push([xNorm, yNorm]);
+      }
+      normalizedPattern.push(normalized_stroke_i);
+    }
+    recordedPattern = normalizedPattern;
+    console.log(recordedPattern);
+    redraw();
+  }
+
+</script>
+<body onload="init()">
+  <canvas id="can" width="256" height="256" style="position:absolute;top:50;left:50;border:2px solid;"></canvas>
+
+  <button onclick="erase()" style = "position:absolute;top:320;left:50;width:70;height:30;">Erase</button>
+  <button onclick="deleteLast()" width= "200" style = "position:absolute;top:320;left:120;width:150;height:30;">Erase Last Stroke</button>
+  <button onclick="recognize()" style = "position:absolute;top:320;left:270;width:40;height:30;">&#128269;</button>
+  <button onclick="normalizeLinear()" style = "position:absolute;top:390;left:50;width:40;height:30;">test</button>
+
+  <div id="candidateList" style = "position:absolute;top:360;left:50;">Results </div>
+</body>
+</html>
