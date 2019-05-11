@@ -104,8 +104,6 @@
   }
 
   function redraw() {
-    console.log(recordedPattern);
-
       ctx.clearRect(0, 0, w, h);
       for(var i = 0;i<recordedPattern.length;i++) {
         var stroke_i = recordedPattern[i]
@@ -115,7 +113,6 @@
 
           currX = stroke_i[j+1][0];
           currY = stroke_i[j+1][1];
-          console.log("currX");
           draw();
         }
       }
@@ -125,10 +122,8 @@
     document.getElementById("candidateList").innerHTML = "日本";
   }
 
-  // rasterize screen input by adding points
-  // using bresenhams line algorithm
+  // linearly stretch drawn symbol
   function normalizeLinear() {
-    console.log("start");
 
     var normalizedPattern = new Array();
     newHeight = 256;
@@ -142,7 +137,6 @@
       var stroke_i = recordedPattern[i];
       for(var j = 0; j<stroke_i.length;j++) {
         x = stroke_i[j][0];
-        console.log(x);
         y = stroke_i[j][1];
         if(x < xMin) {
           xMin = x;
@@ -181,9 +175,124 @@
       normalizedPattern.push(normalized_stroke_i);
     }
     recordedPattern = normalizedPattern;
-    console.log(recordedPattern);
     redraw();
   }
+  
+  function euclid(x1y1, x2y2) {
+      var a = x1y1[0] - x2y2[0];
+      var b = x1y1[1] - x2y2[1];
+      var c = Math.sqrt( a*a + b*b );
+	  return c;
+  }
+
+  // extract points in regular intervals
+  function extractFeatures(kanji, interval) {
+      var extractedPattern = new Array();
+      var nrStrokes = kanji.length;
+	  for(var i = 0;i<nrStrokes;i++) {
+	      var stroke_i = kanji[i];
+		  var extractedStroke_i = new Array();
+		  var dist = 0.0;
+	      var j = 0;
+		  while(j < stroke_i.length) {
+		      // always add first point
+		      if(j==0) {
+			  	  var x1y1 = stroke_i[0];
+		          extractedStroke_i.push(x1y1);
+			  }
+		      if(j > 0) {
+			      var x1y1 = stroke_i[j-1];
+				  var x2y2 = stroke_i[j];
+		          dist += euclid(x1y1, x2y2);
+              }
+			  console.log(dist);
+			  if((dist >= interval) && (j>1)) {
+			      dist = dist - interval;
+				  var x1y1 = stroke_i[j];
+				  extractedStroke_i.push(x1y1);
+			  }
+			  j++;
+		  }
+		  // if we so far have only one point, always add last point
+		  if(extractedStroke_i.length == 1) {
+		      var x1y1 = stroke_i[stroke_i.length-1];
+		      extractedStroke_i.push(x1y1);
+		  } else {
+		      if(dist > (0.75 * interval)) {
+			      var x1y1 = stroke_i[stroke_i.length-1];
+		          extractedStroke_i.push(x1y1);
+			  }		  
+		  }
+		  extractedPattern.push(extractedStroke_i);
+	  }
+      return extractedPattern;
+   }
+   
+   function extractTest() {
+      var ex = extractFeatures(recordedPattern, 20.);
+	  recordedPattern = ex;
+	  console.log("Extracted FEatures:");
+      console.log(ex);
+      redraw();
+   }
+   
+   function endPointDistance(pattern1, pattern2) {
+       var dist = 0;
+	   var l1 = pattern1.length;
+	   var l2 = pattern2.length;
+       if(l1 == 0 || l2 == 0) {
+          return 0;
+       } else {
+	       var x1y1 = pattern1[0];
+		   var x2y2 = pattern2[0];
+		   dist += (Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]));
+           var x1y1 = pattern1[l1-1];
+		   var x2y2 = pattern2[l2-1];
+		   dist += (Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]));
+	   }
+	   return dist;
+   }
+   
+   function initialDistance(pattern1, pattern2) {
+       var l1 = pattern1.length;
+	   var l2 = pattern2.length;
+	   var lmin = Math.min(l1,l2);
+	   var dist = 0;
+	   for(var i = 0; i<lmin;i++) {
+	       var x1y1 = pattern1[i];
+		   var x2y2 = pattern2[i];
+	       dist += (Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]));
+	   }
+	   return dist;
+   }
+   
+   function wholeWholeDistance(pattern1, pattern2) {
+       var l1 = pattern1.length;
+	   var l2 = pattern2.length;
+	   // definitions as in paper
+	   var m = l1;
+	   var n = l2;
+	   var r = pattern1;
+	   var t = pattern2;
+	   if(l1 < l2) {
+	       m = l2;
+		   n = l1;
+		   r = pattern2;
+		   t = pattern1;
+	   }	   	   
+	   var dist = 0;
+	   for(var i = 0; i<n;i++) {
+	       j_of_i = parseInt(parseInt(m/n) * i) + 1;
+		   var x1y1 = r[j_of_i];
+		   var x2y2 = t[i];
+	       dist += (Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]));
+	   }
+	   return parseInt(dist/n);
+   }
+   
+   
+
+//<button onclick="normalizeLinear()" style = "position:absolute;top:390;left:50;width:40;height:30;">test</button>
 
 </script>
 <body onload="init()">
@@ -192,8 +301,8 @@
   <button onclick="erase()" style = "position:absolute;top:320;left:50;width:70;height:30;">Erase</button>
   <button onclick="deleteLast()" width= "200" style = "position:absolute;top:320;left:120;width:150;height:30;">Erase Last Stroke</button>
   <button onclick="recognize()" style = "position:absolute;top:320;left:270;width:40;height:30;">&#128269;</button>
-  <button onclick="normalizeLinear()" style = "position:absolute;top:390;left:50;width:40;height:30;">test</button>
-
+  
+  <button onclick="extractTest()" style = "position:absolute;top:390;left:50;width:40;height:30;">test</button>
   <div id="candidateList" style = "position:absolute;top:360;left:50;">Results </div>
 </body>
 </html>
