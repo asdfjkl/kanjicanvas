@@ -315,15 +315,15 @@
 	      map[i] = -1;
 	   }
 	   var free = new Array();
-	   for(var i=0;i<m;i++) {
+	   for(var i=0;i<n;i++) {
 	      free[i] = true;
 	   }
-	   for(var i=0;i<n;i++) {
+	   for(var i=0;i<m;i++) {
            minDist = 10000000;
 		   min_j = -1;
-		   for(var j=0;j<m;j++) {
+		   for(var j=0;j<n;j++) {
 		       if(free[j] == true) {
-			       var d = distanceMetric(k1[i],k2[j]);
+			       var d = distanceMetric(k1[j],k2[i]);
   			       if(d < minDist) {
 				       minDist = d;
 					   min_j = j;
