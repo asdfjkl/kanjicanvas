@@ -13,7 +13,7 @@
 
   // test data, remove for production
   var test_k2 = [ [ [0,10], [30,10], [60,10] ]   , [ [170,10], [200,10], [220,10] ] ];
-  var test_k21 = [ [ [10,15], [30,15], [50,15]  ], [ [50,15], [55,15] [60,15] ], [ [170,15], [175,15], [180,15]  ], [ [180,15], [220,15]  ] ];
+  var test_k21 = [ [ [10,15], [30,15], [50,15]  ], [ [50,15], [55,15], [60,15] ], [ [170,15], [175,15], [180,15]  ], [ [180,15], [220,15]  ] ];
   
 		
   function init() {
@@ -210,7 +210,6 @@
 				  var x2y2 = stroke_i[j];
 		          dist += euclid(x1y1, x2y2);
               }
-			  console.log(dist);
 			  if((dist >= interval) && (j>1)) {
 			      dist = dist - interval;
 				  var x1y1 = stroke_i[j];
@@ -324,10 +323,6 @@
 		   min_j = -1;
 		   for(var j=0;j<m;j++) {
 		       if(free[j] == true) {
-			   		console.log("p1");
-        console.log(k1[i]);
-		console.log("p2");
-		console.log(k2[j]);
 			       var d = distanceMetric(k1[i],k2[j]);
   			       if(d < minDist) {
 				       minDist = d;
