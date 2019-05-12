@@ -269,27 +269,192 @@
    function wholeWholeDistance(pattern1, pattern2) {
        var l1 = pattern1.length;
 	   var l2 = pattern2.length;
-	   // definitions as in paper
-	   var m = l1;
-	   var n = l2;
-	   var r = pattern1;
-	   var t = pattern2;
+	   // definitions as in paper 
+	   // i.e. n is larger 
+	   var n = l1;
+	   var m = l2;
+	   var k1 = pattern1;
+	   var k2 = pattern2;
 	   if(l1 < l2) {
-	       m = l2;
-		   n = l1;
-		   r = pattern2;
-		   t = pattern1;
+	       m = l1;
+		   n = l2;
+		   k1 = pattern2;
+		   k2 = pattern1;
 	   }	   	   
+	   // larger is now k1 with length n
 	   var dist = 0;
-	   for(var i = 0; i<n;i++) {
-	       j_of_i = parseInt(parseInt(m/n) * i) + 1;
-		   var x1y1 = r[j_of_i];
-		   var x2y2 = t[i];
+	   for(var i = 0; i<m;i++) {
+	       j_of_i = parseInt(parseInt(n/m) * i) + 1;
+		   var x1y1 = k1[j_of_i];
+		   var x2y2 = k2[i];
 	       dist += (Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]));
 	   }
-	   return parseInt(dist/n);
+	   return parseInt(dist/m);
    }
    
+   function initStrokeMap(pattern1, pattern2, distanceMetric) {
+       var l1 = pattern1.length;
+	   var l2 = pattern2.length;
+	   var n = l1;
+	   var m = l2;
+	   var k1 = pattern1;
+	   var k2 = pattern2;
+	   if(l1 < l2) {
+	       m = l1;
+		   n = l2;
+		   k1 = pattern2;
+		   k2 = pattern1;
+	   }
+	   // larger is now k1 with length n
+	   var map = new Array();
+	   for(var i=0;i<n;i++) {
+	      map[i] = -1;
+	   }
+	   var free = new Array();
+	   for(var i=0;i<m;i++) {
+	      free[i] = true;
+	   }
+	   for(var i=0;i<n;i++) {
+           minDist = 10000000;
+		   min_j = -1;
+		   for(var j=0;j<m;j++) {
+		       if(free[j] == true) {
+			       var d = distanceMetric(k1[i],k2[j]);
+  			       if(d < minDist) {
+				       minDist = d;
+					   min_j = j;
+			       }
+			   }
+		   }
+		   free[min_j] = false;
+           map[min_j] = i;
+       }	   
+	   return map;   
+    }
+
+	function improve(pattern1, pattern2, distanceMetric) {
+	   var L = 3;
+	   var l1 = pattern1.length;
+	   var l2 = pattern2.length;
+	   var n = l1;
+	   var m = l2;
+	   var k1 = pattern1;
+	   var k2 = pattern2;
+	   if(l1 < l2) {
+	       m = l1;
+		   n = l2;
+		   k1 = pattern2;
+		   k2 = pattern1;
+	   }
+	   // larger is now k1 with length n
+	   var map = initStrokeMap(k1, k2, distanceMetric);
+	   for(var l=0;l<L;l++) {
+	       for(var i=0;i<map.length;i++) {
+		       if(map[i] != -1) {
+                   dii = distanceMetric(k1[i], k2[map[i]]);
+				   for(var j=0;j<map.length;j++) {
+				       // we need to check again, since 
+					   // manipulation of map[i] can occur within
+					   // the j-loop
+					   if(map[i] != -1) {
+					       if(map[j] != -1) {
+						      var djj = distanceMetric(k1[j],k2[map[j]]);
+                              var dij = distanceMetric(k1[j],k2[map[i]]);
+                              var dji = distanceMetric(k1[i],k2[map[j]]);
+							  if(ji + ij < ii + jj) {
+							      var mapj = map[j];
+								  map[j] = map[i];
+								  map[i] = mapj;
+								  dii = dij;
+							  }
+						   } else {
+						       var dij = distanceMetric(k1[j], k2[map[i]]);
+                               if(dij < dii) {
+                                  map[j] = map[i];
+                                  map[i] = -1;
+                                  dii = dij;
+							    }
+						   }
+					   }
+				   }				   
+               }
+		   }
+	   }
+       return map;	   
+	}
+	
+	function completeMap(k1, k2, distanceMetric, map) {
+	    if(!map.includes(-1)) {
+		    return map;
+		}
+		// complete at the end
+		var lastUnassigned = map[map.length];
+		var mapLastTo = -1;
+		for(var i = map.length -1; i==0;i--) {
+		    if(map[i] == -1) {
+			    lastUnassigned = i;
+			} else {
+			    mapLastTo = map[i];
+			    break;
+			}
+		}
+		for(var i=lastUnassigned;i<map.length;i++) {
+		    map[i] = mapLastTo;
+		}
+		// complete at the beginning
+		var firstUnassigned = -1;
+		var mapFirstTo = -1;
+		for(var i = 0;i<map.length;i++) {
+		    if(map[i] == -1) {
+			    firstUnassigned = i;
+			} else {
+			    mapFirstTo = map[i];
+				break;
+			}
+		}		
+		for(var i=0;i<=firstUnassigned;i++) {
+		    map[i] = mapFirstTo;
+		}
+		// for the remaining unassigned, check
+		// where to "split"
+        for(var i=0;i<map.length;i++) {
+            if(i+1 < map.length && map[i+1] == -1) {
+               // we have a situation like this:
+               //   i       i+1   i+2   ...  i+n 
+               //   start   -1    ?     -1   stop
+               var start = i;
+               var stop = i+1;
+               while(stop<map.length && map[stop] == -1) {
+                  stop++;
+               }
+               var div = start;
+               var max_dist = 1000000;
+               for(var j=start;j<stop;j++) {
+                   var stroke_ab = k1[start];
+			     	for(var temp=start+1;temp<=j;temp++) {
+				       stroke_ab.concat(k1[temp]);
+			    	}
+				   var stroke_bc = k1[j+1];
+				   for(var temp=j+1;temp<=stop;temp++) {
+				       stroke_bc.concat(k1[temp]);
+				   }
+				   var d_ab = distanceMetric(stroke_ab, k2[start]);
+				   var d_bc = distanceMetric(stroke_bc, k2[stop]);				
+                   if(d_ab + d_bc < max_dist) {
+                       div = j;
+                       max_dist = d_ab + d_bc;
+                   }
+               }
+               for(var j=start;j<=div;j++) {
+                   map[j] = map[start];
+               }
+               for(int j=div+1;j<stop;j++) {
+                   map[j] = map[stop];
+               }
+            } 
+        }
+    return map;
+	}
    
 
 //<button onclick="normalizeLinear()" style = "position:absolute;top:390;left:50;width:40;height:30;">test</button>
