@@ -11,6 +11,11 @@
   var recordedPattern = new Array();
   var curentLine;
 
+  // test data, remove for production
+  var test_k2 = [ [ [0,10], [30,10], [60,10] ]   , [ [170,10], [200,10], [220,10] ] ];
+  var test_k21 = [ [ [10,15], [30,15], [50,15]  ], [ [50,15], [55,15] [60,15] ], [ [170,15], [175,15], [180,15]  ], [ [180,15], [220,15]  ] ];
+  
+		
   function init() {
     canvas = document.getElementById('can');
     ctx = canvas.getContext("2d");
@@ -246,8 +251,8 @@
 	       var x1y1 = pattern1[0];
 		   var x2y2 = pattern2[0];
 		   dist += (Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]));
-           var x1y1 = pattern1[l1-1];
-		   var x2y2 = pattern2[l2-1];
+           x1y1 = pattern1[l1-1];
+		   x2y2 = pattern2[l2-1];
 		   dist += (Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]));
 	   }
 	   return dist;
@@ -319,6 +324,10 @@
 		   min_j = -1;
 		   for(var j=0;j<m;j++) {
 		       if(free[j] == true) {
+			   		console.log("p1");
+        console.log(k1[i]);
+		console.log("p2");
+		console.log(k2[j]);
 			       var d = distanceMetric(k1[i],k2[j]);
   			       if(d < minDist) {
 				       minDist = d;
@@ -448,13 +457,19 @@
                for(var j=start;j<=div;j++) {
                    map[j] = map[start];
                }
-               for(int j=div+1;j<stop;j++) {
+               for(var j=div+1;j<stop;j++) {
                    map[j] = map[stop];
                }
             } 
         }
     return map;
 	}
+	
+	function testMap() {
+	  var map = initStrokeMap(test_k21,test_k2,endPointDistance);
+	  console.log(map);	
+	}
+	
    
 
 //<button onclick="normalizeLinear()" style = "position:absolute;top:390;left:50;width:40;height:30;">test</button>
@@ -467,7 +482,8 @@
   <button onclick="deleteLast()" width= "200" style = "position:absolute;top:320;left:120;width:150;height:30;">Erase Last Stroke</button>
   <button onclick="recognize()" style = "position:absolute;top:320;left:270;width:40;height:30;">&#128269;</button>
   
-  <button onclick="extractTest()" style = "position:absolute;top:390;left:50;width:40;height:30;">test</button>
+  <button onclick="extractTest()" style = "position:absolute;top:390;left:50;width:40;height:30;">extract test</button>
+  <button onclick="testMap()" style = "position:absolute;top:390;left:200;width:40;height:30;">map test</button>
   <div id="candidateList" style = "position:absolute;top:360;left:50;">Results </div>
 </body>
 </html>
