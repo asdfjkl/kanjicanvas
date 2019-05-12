@@ -365,7 +365,7 @@
 						      var djj = distanceMetric(k1[j],k2[map[j]]);
                               var dij = distanceMetric(k1[j],k2[map[i]]);
                               var dji = distanceMetric(k1[i],k2[map[j]]);
-							  if(ji + ij < ii + jj) {
+							  if(dji + dij < dii + djj) {
 							      var mapj = map[j];
 								  map[j] = map[i];
 								  map[i] = mapj;
@@ -427,28 +427,36 @@
                //   i       i+1   i+2   ...  i+n 
                //   start   -1    ?     -1   stop
                var start = i;
+			   console.log("start");
+               console.log(start);
                var stop = i+1;
                while(stop<map.length && map[stop] == -1) {
                   stop++;
                }
+			   console.log("stop");
+			   console.log(stop);
                var div = start;
                var max_dist = 1000000;
                for(var j=start;j<stop;j++) {
                    var stroke_ab = k1[start];
 			     	for(var temp=start+1;temp<=j;temp++) {
-				       stroke_ab.concat(k1[temp]);
+				       stroke_ab = stroke_ab.concat(k1[temp]);
 			    	}
+					console.log(stroke_ab);
 				   var stroke_bc = k1[j+1];
 				   for(var temp=j+1;temp<=stop;temp++) {
-				       stroke_bc.concat(k1[temp]);
+				       stroke_bc = stroke_bc.concat(k1[temp]);
 				   }
-				   var d_ab = distanceMetric(stroke_ab, k2[start]);
-				   var d_bc = distanceMetric(stroke_bc, k2[stop]);				
+				   console.log(stroke_bc);
+				   var d_ab = distanceMetric(stroke_ab, k2[map[start]]);
+				   var d_bc = distanceMetric(stroke_bc, k2[map[stop]]);				
                    if(d_ab + d_bc < max_dist) {
                        div = j;
                        max_dist = d_ab + d_bc;
                    }
                }
+			   console.log("div:");
+			   console.log(div);
                for(var j=start;j<=div;j++) {
                    map[j] = map[start];
                }
@@ -461,7 +469,18 @@
 	}
 	
 	function testMap() {
-	  var map = initStrokeMap(test_k21,test_k2,endPointDistance);
+	  // var map = initStrokeMap(test_k21,test_k2,endPointDistance);
+	    // should give
+        // 0  1  2 3 
+        // 0 -1 -1 1  
+	  var map = improve(test_k21,test_k2,endPointDistance);
+	    // should also give
+        // 0  1  2 3 
+        // 0 -1 -1 1  
+	  map = completeMap(test_k21,test_k2,endPointDistance, map);
+	    // should give
+        // 0  1  2 3 
+        // 0 0 1 1  
 	  console.log(map);	
 	}
 	
