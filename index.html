@@ -15,6 +15,10 @@
   var test_k2 = [ [ [0,10], [30,10], [60,10] ]   , [ [170,10], [200,10], [220,10] ] ];
   var test_k21 = [ [ [10,15], [30,15], [50,15]  ], [ [50,15], [55,15], [60,15] ], [ [170,15], [175,15], [180,15]  ], [ [180,15], [220,15]  ] ];
   
+  var refPatterns = [ ["い", 2, [  [[0,15], [30,13], [60,14]], [[0,10], [30,10], [60,10]] ] ] ,
+                      ["を", 3, [  [[0,17], [30,17], [60,17]], [[0,15], [30,13], [60,12]], [[0,15], [30,13], [60,12]] ]  ] 
+					] 
+  
 		
   function init() {
     canvas = document.getElementById('can');
@@ -270,8 +274,8 @@
 	   return dist;
    }
    
-   function wholeWholeDistance(pattern1, pattern2) {
-       var l1 = pattern1.length;
+   function getLargerAndSize(pattern1, pattern2) {
+	   var l1 = pattern1.length;
 	   var l2 = pattern2.length;
 	   // definitions as in paper 
 	   // i.e. n is larger 
@@ -285,6 +289,11 @@
 		   k1 = pattern2;
 		   k2 = pattern1;
 	   }	   	   
+       return [k1,k2,n,m];
+   }
+   
+   function wholeWholeDistance(pattern1, pattern2) {
+       var [k1,k2,n,m] = getLargerAndSize(pattern1, pattern2);
 	   // larger is now k1 with length n
 	   var dist = 0;
 	   for(var i = 0; i<m;i++) {
@@ -297,18 +306,7 @@
    }
    
    function initStrokeMap(pattern1, pattern2, distanceMetric) {
-       var l1 = pattern1.length;
-	   var l2 = pattern2.length;
-	   var n = l1;
-	   var m = l2;
-	   var k1 = pattern1;
-	   var k2 = pattern2;
-	   if(l1 < l2) {
-	       m = l1;
-		   n = l2;
-		   k1 = pattern2;
-		   k2 = pattern1;
-	   }
+	   var [k1,k2,n,m] = getLargerAndSize(pattern1, pattern2);
 	   // larger is now k1 with length n
 	   var map = new Array();
 	   for(var i=0;i<n;i++) {
@@ -336,21 +334,10 @@
 	   return map;   
     }
 
-	function improve(pattern1, pattern2, distanceMetric) {
-	   var L = 3;
-	   var l1 = pattern1.length;
-	   var l2 = pattern2.length;
-	   var n = l1;
-	   var m = l2;
-	   var k1 = pattern1;
-	   var k2 = pattern2;
-	   if(l1 < l2) {
-	       m = l1;
-		   n = l2;
-		   k1 = pattern2;
-		   k2 = pattern1;
-	   }
+	function getMap(pattern1, pattern2, distanceMetric) {
+       var [k1,k2,n,m] = getLargerAndSize(pattern1, pattern2);
 	   // larger is now k1 with length n
+	   var L = 3;
 	   var map = initStrokeMap(k1, k2, distanceMetric);
 	   for(var l=0;l<L;l++) {
 	       for(var i=0;i<map.length;i++) {
@@ -439,11 +426,16 @@
                var max_dist = 1000000;
                for(var j=start;j<stop;j++) {
                    var stroke_ab = k1[start];
+				   // iteration of concat, possibly slow
+				   // due to memory allocations; optimize?!
 			     	for(var temp=start+1;temp<=j;temp++) {
 				       stroke_ab = stroke_ab.concat(k1[temp]);
 			    	}
 					console.log(stroke_ab);
 				   var stroke_bc = k1[j+1];
+				   console.log("stroke bc:");
+				   console.log(k1);
+				   console.log(j+1);
 				   for(var temp=j+1;temp<=stop;temp++) {
 				       stroke_bc = stroke_bc.concat(k1[temp]);
 				   }
@@ -468,12 +460,58 @@
     return map;
 	}
 	
+	function computeDistance(pattern1, pattern2, distanceMetric, map) {
+	     var [k1,k2,n,m] = getLargerAndSize(pattern1, pattern2);
+		 var dist = 0.0;
+		 var idx = 0;
+		 while(idx < n) {
+		     var stroke_idx = k1[idx];
+			 var start = map[idx];
+			 var stop  = start+1;
+			 while(stop<map.length && map[stop] == start) {
+                  stop++;
+             }
+			 var stroke_concat = k2[start];
+			 for(var temp=start+1;temp<stop;temp++) {
+				stroke_concat = stroke_concat.concat(k2[temp]);
+			 }
+			 dist += distanceMetric(stroke_idx, stroke_concat);
+		 }
+		 return dist;
+	}
+	
+	
+	function coarseClassification(inputPattern)  {
+	   var inputLength = inputPattern.length;
+	   var candidates = [];
+	   for(var i=0;i<refPatterns.length;i++) {
+	       var iLength = refPatterns[i][1];
+		   if(inputLength < iLength + 10 && inputLength > iLength-2) {
+		       var iPattern = refPatterns[i][2];
+			   var iMap = getMap(iPattern, inputPattern, endPointDistance);
+			   iMap =  completeMap(iPattern, inputPattern, endPointDistance, iMap);
+			   var dist = computeDistance(iPattern, inputPattern, endPointDistance, iMap);
+			   candidates.push([i, dist]);
+		   }
+	   }
+	   candidates.sort(function(a, b){return a[1]-b[1]});
+	   var outStr = "";
+	   for(var i=0;i<candidates.length;i++) {
+	       outStr += candidates[i][0];
+		   outStr += " ";
+		   outStr += candidates[i][1];
+		   outStr += refPatterns[candidates[i][0]][0];
+		   outStr += "|";	   
+	   }	   
+	   document.getElementById("candidateList").innerHTML = outStr;	   
+	} 
+	
 	function testMap() {
 	  // var map = initStrokeMap(test_k21,test_k2,endPointDistance);
 	    // should give
         // 0  1  2 3 
         // 0 -1 -1 1  
-	  var map = improve(test_k21,test_k2,endPointDistance);
+	  var map = getMap(test_k21,test_k2,endPointDistance);
 	    // should also give
         // 0  1  2 3 
         // 0 -1 -1 1  
@@ -482,6 +520,15 @@
         // 0  1  2 3 
         // 0 0 1 1  
 	  console.log(map);	
+	}
+	
+	function testAll() {
+	   normalizeLinear();
+	   var extractedFeatures = extractFeatures(recordedPattern, 20.);
+	   var map = getMap(extractedFeatures, refPatterns[0][2] ,endPointDistance);
+	   map = completeMap(extractedFeatures, refPatterns[0][2],endPointDistance, map);
+
+	   //coarseClassification(extractedFeatures);
 	}
 	
    
@@ -498,6 +545,7 @@
   
   <button onclick="extractTest()" style = "position:absolute;top:390;left:50;width:40;height:30;">extract test</button>
   <button onclick="testMap()" style = "position:absolute;top:390;left:200;width:40;height:30;">map test</button>
+  <button onclick="testAll()" style = "position:absolute;top:390;left:250;width:40;height:30;">test all</button>
   <div id="candidateList" style = "position:absolute;top:360;left:50;">Results </div>
 </body>
 </html>
