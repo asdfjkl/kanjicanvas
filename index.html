@@ -408,7 +408,9 @@
 
 		var lastUnassigned = map[map.length];
 		var mapLastTo = -1;
-		for(var i = map.length -1; i==0;i--) {
+		for(var i = map.length -1; i>=0;i--) {
+		    console.log("at map i:");
+		    console.log(i);
 		    if(map[i] == -1) {
 			    lastUnassigned = i;
 			} else {
@@ -416,10 +418,13 @@
 			    break;
 			}
 		}
+		console.log("map last to:");
+		console.log(mapLastTo);
 		for(var i=lastUnassigned;i<map.length;i++) {
 		    map[i] = mapLastTo;
 		}
-
+		console.log("after end comp");
+console.log(map);
 		// complete at the beginning
 		var firstUnassigned = -1;
 		var mapFirstTo = -1;
@@ -463,6 +468,10 @@
 				   for(var temp=j+2;temp<=stop;temp++) {
 				       stroke_bc = stroke_bc.concat(k1[temp]);
 				   }
+				   console.log("stroke bc:");
+				   console.log(stroke_bc);
+				   console.log("k2");
+				   console.log(k2[map[stop]]);
 				   var d_ab = distanceMetric(stroke_ab, k2[map[start]]);
 				   var d_bc = distanceMetric(stroke_bc, k2[map[stop]]);				
                    if(d_ab + d_bc < max_dist) {
@@ -492,11 +501,18 @@
 			 while(stop<map.length && map[stop] == start) {
                   stop++;
              }
+			 console.log("stop");
+			 console.log(stop);
 			 var stroke_concat = k2[start];
 			 for(var temp=start+1;temp<stop;temp++) {
-				stroke_concat = stroke_concat.concat(k2[temp]);
+				stroke_concat = stroke_concat.concat(k2[map[temp]]);
 			 }
+			 console.log("dist: ");
+			 console.log(stroke_idx);
+			 console.log(k2);
+			 console.log(stroke_concat);
 			 dist += distanceMetric(stroke_idx, stroke_concat);
+			 idx += 1;
 		 }
 		 return dist;
 	}
@@ -560,23 +576,17 @@
 	}
 	
 	function testAll() {
-	   console.log("before normalization");
-	   console.log(recordedPattern);
-	   	   console.log("after normalization");
 
 	   normalizeLinear();
 
-	   console.log(recordedPattern);
 	   var extractedFeatures = extractFeatures(recordedPattern, 20.);
-	   console.log("extracted features:");
-	   console.log(extractedFeatures);
-	   console.log("ref 02");
-	   console.log("extracted features:");
-	   console.log(refPatterns[0][2]);
+
 	   var map = getMap(extractedFeatures, refPatterns[0][2] ,endPointDistance);
+	   console.log("map");
+	   console.log(map);
 	   map = completeMap(extractedFeatures, refPatterns[0][2],endPointDistance, map);
 
-	   //coarseClassification(extractedFeatures);
+	   coarseClassification(extractedFeatures);
 	}
 	
    
