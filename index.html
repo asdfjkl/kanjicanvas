@@ -1,7 +1,7 @@
 <meta charset="UTF-8">
 <html>
 <script type="text/javascript">
-  var canvas, ctx, flag = false,
+  var canvas, ctx, flagOver, flagDown = false,
   prevX = 0,
   currX = 0,
   prevY = 0,
@@ -14,7 +14,9 @@
   // test data, remove for production
   var test_k2 = [ [ [0,10], [30,10], [60,10] ]   , [ [170,10], [200,10], [220,10] ] ];
   var test_k21 = [ [ [10,15], [30,15], [50,15]  ], [ [50,15], [55,15], [60,15] ], [ [170,15], [175,15], [180,15]  ], [ [180,15], [220,15]  ] ];
-  
+  var test_k22 = [ [ [0,15], [40,15] ], [ [40,15], [50,15] ], [ [50,15], [50,15]], [ [170,15], [220,15]  ] ];
+ var test_k23 = [ [ [0,15], [60,15] ], [ [170,15], [180,15] ], [ [180,15], [190,15]], [ [170,15], [220,15]  ] ];
+
   var refPatterns = [ ["い", 2, [  [[0,15], [30,13], [60,14]], [[0,10], [30,10], [60,10]] ] ] ,
                       ["を", 3, [  [[0,17], [30,17], [60,17]], [[0,15], [30,13], [60,12]], [[0,15], [30,13], [60,12]] ]  ] 
 					] 
@@ -37,6 +39,9 @@
     }, false);
     canvas.addEventListener("mouseout", function (e) {
       findxy('out', e)
+    }, false);
+	canvas.addEventListener("mouseover", function (e) {
+      findxy('over', e)
     }, false);
   }
 
@@ -71,17 +76,19 @@
     recordedPattern.length = 0;
   }
 
+  // add flag for button down!!!
   function findxy(res, e) {
     if (res == 'down') {
       prevX = currX;
       prevY = currY;
       currX = e.clientX - canvas.offsetLeft;
       currY = e.clientY - canvas.offsetTop;
-
+      //console.log("DOWN");
       currentLine = new Array();
       currentLine.push([currX, currY]);
 
-      flag = true;
+      flagDown = true;
+	  flagOver = true;
       dot_flag = true;
       if (dot_flag) {
         ctx.beginPath();
@@ -91,16 +98,36 @@
       }
     }
     if (res == 'up') {
-      flag = false;
-      recordedPattern.push(currentLine);
+      flagDown = false;
+	  //console.log("UP");
+	  if(flagOver == true) {
+          recordedPattern.push(currentLine);
+	  }
     }
 
     if (res == "out") {
-      flag = false;
+      flagOver = false;
+	  if(flagDown == true) {
+	      recordedPattern.push(currentLine);
+	  }
+	  flagDown = false;
+	  //console.log("OUT");
+	  //if(currentLine.length != 0) {
+	  //recordedPattern.push(currentLine);
+	  //}
+    }
+	
+	if (res == "over") {
+      //flagOver = true;
+	  //console.log("OVER");
+	  //if(currentLine.length != 0) {
+	  //recordedPattern.push(currentLine);
+	  //}
     }
 
     if (res == 'move') {
-      if (flag) {
+	//console.log("MOVE");
+      if (flagOver && flagDown) {
         prevX = currX;
         prevY = currY;
         currX = e.clientX - canvas.offsetLeft;
@@ -239,8 +266,7 @@
    function extractTest() {
       var ex = extractFeatures(recordedPattern, 20.);
 	  recordedPattern = ex;
-	  console.log("Extracted FEatures:");
-      console.log(ex);
+
       redraw();
    }
    
@@ -379,6 +405,7 @@
 		    return map;
 		}
 		// complete at the end
+
 		var lastUnassigned = map[map.length];
 		var mapLastTo = -1;
 		for(var i = map.length -1; i==0;i--) {
@@ -392,6 +419,7 @@
 		for(var i=lastUnassigned;i<map.length;i++) {
 		    map[i] = mapLastTo;
 		}
+
 		// complete at the beginning
 		var firstUnassigned = -1;
 		var mapFirstTo = -1;
@@ -408,20 +436,19 @@
 		}
 		// for the remaining unassigned, check
 		// where to "split"
+
         for(var i=0;i<map.length;i++) {
             if(i+1 < map.length && map[i+1] == -1) {
                // we have a situation like this:
                //   i       i+1   i+2   ...  i+n 
                //   start   -1    ?     -1   stop
                var start = i;
-			   console.log("start");
-               console.log(start);
+
                var stop = i+1;
                while(stop<map.length && map[stop] == -1) {
                   stop++;
                }
-			   console.log("stop");
-			   console.log(stop);
+
                var div = start;
                var max_dist = 1000000;
                for(var j=start;j<stop;j++) {
@@ -431,15 +458,11 @@
 			     	for(var temp=start+1;temp<=j;temp++) {
 				       stroke_ab = stroke_ab.concat(k1[temp]);
 			    	}
-					console.log(stroke_ab);
 				   var stroke_bc = k1[j+1];
-				   console.log("stroke bc:");
-				   console.log(k1);
-				   console.log(j+1);
-				   for(var temp=j+1;temp<=stop;temp++) {
+
+				   for(var temp=j+2;temp<=stop;temp++) {
 				       stroke_bc = stroke_bc.concat(k1[temp]);
 				   }
-				   console.log(stroke_bc);
 				   var d_ab = distanceMetric(stroke_ab, k2[map[start]]);
 				   var d_bc = distanceMetric(stroke_bc, k2[map[stop]]);				
                    if(d_ab + d_bc < max_dist) {
@@ -447,8 +470,6 @@
                        max_dist = d_ab + d_bc;
                    }
                }
-			   console.log("div:");
-			   console.log(div);
                for(var j=start;j<=div;j++) {
                    map[j] = map[start];
                }
@@ -520,11 +541,38 @@
         // 0  1  2 3 
         // 0 0 1 1  
 	  console.log(map);	
+	  
+	  map = getMap(test_k22,test_k2,endPointDistance);
+	    // 0  1  2 3 
+        // 0 -1 -1 1
+	  map = completeMap(test_k22,test_k2,endPointDistance, map);
+       // 0 1 2 3 
+        // 0 0 0 1  
+	  console.log(map);	
+	  
+	  	  map = getMap(test_k23,test_k2,endPointDistance);
+        // 0  1  2 3 
+        // 0 -1 -1 1   
+	  map = completeMap(test_k23,test_k2,endPointDistance, map);
+        // 0  1  2 3 
+        // 0  1  1 1
+	  console.log(map);	
 	}
 	
 	function testAll() {
+	   console.log("before normalization");
+	   console.log(recordedPattern);
+	   	   console.log("after normalization");
+
 	   normalizeLinear();
+
+	   console.log(recordedPattern);
 	   var extractedFeatures = extractFeatures(recordedPattern, 20.);
+	   console.log("extracted features:");
+	   console.log(extractedFeatures);
+	   console.log("ref 02");
+	   console.log("extracted features:");
+	   console.log(refPatterns[0][2]);
 	   var map = getMap(extractedFeatures, refPatterns[0][2] ,endPointDistance);
 	   map = completeMap(extractedFeatures, refPatterns[0][2],endPointDistance, map);
 
