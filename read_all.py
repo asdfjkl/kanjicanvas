@@ -36,8 +36,8 @@ def normalizeLinear(kanji):
         for j in range(0, len(stroke_i)):
             x = stroke_i[j][0]
             y = stroke_i[j][1]
-            xNorm = (x - xMin) * (newWidth / oldWidth)
-            yNorm = (y - yMin) * (newHeight / oldHeight)
+            xNorm = (x - xMin) * (float(newWidth) / oldWidth)
+            yNorm = (y - yMin) * (float(newHeight) / oldHeight)
             normalized_stroke_i.append([xNorm, yNorm])
         normalizedPattern.append(normalized_stroke_i)
     return normalizedPattern
@@ -105,10 +105,12 @@ for filename in filenames:
 
 
 for (utf, l, pattern) in kanjis:
+    #print(pattern)
     norm_i = normalizeLinear(pattern)
     ex_i = extractFeatures(norm_i, 20.)
-    print(ex_i)
+    print(str([ utf, l, ex_i])+", ")
 #print(kanjis)                
+
 
 
 """
