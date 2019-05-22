@@ -6,6 +6,7 @@ root = tree.getroot()
 print('\nAll attributes:')  
 for elem in root:  
     print(elem.text.encode("utf-8"))
-    #for subelem in elem:
+    print("elem")
+    for subelem in elem:
         #print(subelem)
-        #print(subelem.attrib)
+        print(subelem.attrib["x"])
