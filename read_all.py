@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET  
 import os
 import math
+import ast
 
 def normalizeLinear(kanji):
     normalizedPattern = []
@@ -81,19 +82,25 @@ def extractFeatures(kanji, interval):
 
 kanjis = [ ]
 
-filenames = (os.listdir("."))
+filenames = (os.listdir("/home/user/code/convert/xmls"))
 for filename in filenames:
     if(filename.endswith(".xml")):
-        tree = ET.parse(filename)
+        tree = ET.parse("/home/user/code/convert/xmls/"+filename)
         root = tree.getroot()
         strokes = []
         char = ""
         for elem in root:
             char_el = elem.text.encode("utf-8")
+            #print(len(elem.text))
+            #s = r"\u"+elem.text #063a\u064a\u0646\u064a\u0627"
+            #print(ast.literal_eval("u'{}'".format(s)))
+            #chr_uni = "\u"+elem.text
+            #print(chr_uni)
             #print(len(char_el))
-            if(len(char_el) == 3):
+            if(len(char_el) == 4):
                 #print("char el:|"+str(char_el)+"|")
-                char = char_el
+                s = r"\u"+elem.text 
+                char = ast.literal_eval("u'{}'".format(s))
             stroke = []
             for subelem in elem:
                 x = int(subelem.attrib["x"])
