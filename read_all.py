@@ -273,9 +273,9 @@ for (utf, l, pattern) in kanjis:
     #print(pattern)
     norm_i = momentNormalize(pattern)
     ex_i = extractFeatures(norm_i, 20.)
-    print("['", end = '')
+    print('["', end = '')
     print(utf, end = '')
-    print("',"+str(l)+","+str(ex_i)+"]")
+    print('",'+str(l)+","+str(ex_i)+"]")
     #print(
     #print(ast.literal_eval("u'{}'".format(utf)))
     #print(str([ utf, l, ex_i])+", ")
