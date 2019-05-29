@@ -46,6 +46,17 @@ def normalizeLinear(kanji):
         normalizedPattern.append(normalized_stroke_i)
     return normalizedPattern
 
+
+def transform(pattern, x, y):
+    p_t = []
+    for i in range(0,len(pattern)):
+        si = pattern[i]
+        si_t = []
+        for j in range(0, len(si)):
+            si_t.append([si[j][0] + x, si[j][1] + y])
+        p_t.append(si_t)
+    return p_t
+
 def m10(pattern):
     sum_ = 0.
     for i in range(0, len(pattern)):
@@ -181,7 +192,8 @@ def momentNormalize(kanji):
             newY = (alpha * (si[j][1] - yc_)) + yc_half
             nsi.append([newX, newY])
         normalizedPattern.append(nsi)
-    return normalizedPattern
+        
+    return transform(normalizedPattern, xOffset, yOffset)
 
 def euclid(x1y1, x2y2):
     a = x1y1[0] - x2y2[0]
