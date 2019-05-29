@@ -242,7 +242,7 @@ for filename in filenames:
             char_el = ""
             #char_el = elem.text.encode("utf-8")
             if first:
-                char_el = filename[0:4].encode("utf-8")
+                char_el = str(filename[0:4]) #.encode("utf-8")
                 #print(char_el)
                 first = False
             #print(len(elem.text))
@@ -255,6 +255,7 @@ for filename in filenames:
                 #print("char el:|"+str(char_el)+"|")
                 #s = r"\u"+elem.text
                 s = r"\u"+char_el
+                #s = char_el
                 char = ast.literal_eval("u'{}'".format(s))
                 #print(char)
             stroke = []
@@ -264,6 +265,7 @@ for filename in filenames:
                 stroke.append([x,y])
             if(len(stroke) > 0):
                 strokes.append(stroke)
+        #print(char)
         kanjis.append([char, len(strokes), strokes])
 
 
@@ -271,7 +273,12 @@ for (utf, l, pattern) in kanjis:
     #print(pattern)
     norm_i = momentNormalize(pattern)
     ex_i = extractFeatures(norm_i, 20.)
-    print(str([ utf, l, ex_i])+", ")
+    print('[', end = '')
+    print(utf, end = '')
+    print(","+str(l)+","+str(ex_i)+"]")
+    #print(
+    #print(ast.literal_eval("u'{}'".format(utf)))
+    #print(str([ utf, l, ex_i])+", ")
 #print(kanjis)
 
 
