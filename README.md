@@ -7,4 +7,4 @@ in client side only Javascript. Subjectively it provides much more robust recogn
 
 # Copyright & License
 
-Copyright (c) 2019 Dominik Klein, licensed under MIT (cf. LICENSE.TXT).
+Copyright (c) 2019-2020 Dominik Klein, Seth Clydesdale, licensed under MIT (cf. LICENSE.TXT).
