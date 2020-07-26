@@ -443,8 +443,8 @@
 		var mu20_ = KanjiCanvas.mu20(KanjiCanvas["recordedPattern_" + id], xc_);
 		var mu02_ = KanjiCanvas.mu02(KanjiCanvas["recordedPattern_" + id], yc_);
 
-		var alpha = (aranWidth) / (4 * Math.sqrt(mu20_/m00_));
-		var beta = (aranHeight) / (4 * Math.sqrt(mu02_/m00_));
+		var alpha = (aranWidth) / (4 * Math.sqrt(mu20_/m00_)) || 0;
+		var beta = (aranHeight) / (4 * Math.sqrt(mu02_/m00_)) || 0;
 			
 		var nf = new Array();
 		for(var i=0;i<KanjiCanvas["recordedPattern_" + id].length;i++) {
