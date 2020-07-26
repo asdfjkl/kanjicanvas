@@ -20,6 +20,22 @@
   -moz-osx-font-smoothing:grayscale;
 }
 
+a, a:visited {
+  color:#36C;
+  text-decoration:none;
+  outline:none;
+}
+
+a:hover { 
+  color:#14A; 
+  text-decoration:underline;
+}
+
+a:focus {
+  color:#028;
+  text-decoration:underline;
+}
+
 header {
   color:#FFF;
   background-color:#36C;
@@ -104,7 +120,6 @@ button {
   margin:3px;
   cursor:pointer;
   outline:none;
-  height:30px;
   -webkit-touch-callout:none;
     -webkit-user-select:none;
      -khtml-user-select:none;
@@ -112,13 +127,14 @@ button {
         -ms-user-select:none;
             user-select:none;
 }
+
 button:hover { background-color:#25B; }
 button:focus { background-color:#14A; }
 
 /* button icons */
 button .fa {
   font-size:18px;
-  vertical-align:middle;
+  vertical-align:-2px;
   margin-right:6px;
 }
 
