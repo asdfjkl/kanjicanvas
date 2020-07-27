@@ -20,6 +20,7 @@
   // init canvas
   KanjiCanvas.init = function (id) {
     KanjiCanvas["canvas_" + id] = document.getElementById(id);
+    KanjiCanvas["canvas_" + id].tabIndex = 0; // makes canvas focusable, allowing usage of shortcuts
     KanjiCanvas["ctx_" + id] = KanjiCanvas["canvas_" + id].getContext("2d");
     KanjiCanvas["w_" + id] = KanjiCanvas["canvas_" + id].width;
     KanjiCanvas["h_" + id] = KanjiCanvas["canvas_" + id].height;
@@ -184,11 +185,11 @@
 
         // outline
         KanjiCanvas["ctx_" + id].lineWidth = 3;
-        KanjiCanvas["ctx_" + id].strokeStyle = KanjiCanvas.alterHex(KanjiCanvas.strokeColors[i], 60, 'dec');
+        KanjiCanvas["ctx_" + id].strokeStyle = KanjiCanvas.alterHex(KanjiCanvas.strokeColors[i] ? KanjiCanvas.strokeColors[i] : "#333333", 60, 'dec');
         KanjiCanvas["ctx_" + id].strokeText((i + 1).toString(), x, y);
 
         // fill
-        KanjiCanvas["ctx_" + id].fillStyle = KanjiCanvas.strokeColors[i] ? KanjiCanvas.strokeColors[i] : "#000";
+        KanjiCanvas["ctx_" + id].fillStyle = KanjiCanvas.strokeColors[i] ? KanjiCanvas.strokeColors[i] : "#333";
         KanjiCanvas["ctx_" + id].fillText((i + 1).toString(), x, y);
       }
     }
@@ -990,4 +991,35 @@
 		document.execCommand('copy');
 		document.body.removeChild(el);
 	};
+  
+  
+  // event listener for shortcuts
+  document.addEventListener('keydown', function (e) {
+    var id = document.activeElement.id;
+    
+    if (KanjiCanvas["canvas_" + id] && e.ctrlKey) {
+      switch (e.key.toLowerCase()) {
+        // undo
+        case 'z' :
+          e.preventDefault();
+          KanjiCanvas.deleteLast(id);
+          break;
+
+        // erase
+        case 'x' :
+          e.preventDefault();
+          KanjiCanvas.erase(id);
+          break;
+        
+        // recognize
+        case 'f' :
+          e.preventDefault();
+          KanjiCanvas.recognize(id);
+          break;
+
+        default :
+          break;
+      }
+    }
+  });
 }(window, document));

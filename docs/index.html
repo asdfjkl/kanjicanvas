@@ -32,9 +32,9 @@
         <div class="kanji-canvas-container">
           <canvas id="can" class="kanji-canvas" data-candidate-list="candidateList" width="256" height="256"></canvas>
           <div class="kanji-canvas-controls">
-            <button onclick="KanjiCanvas.erase('can')"><i class="fa">&#xf12d;</i>Erase</button>
-            <button onclick="KanjiCanvas.deleteLast('can')"><i class="fa">&#xf0e2;</i>Undo</button>
-            <button onclick="KanjiCanvas.recognize('can')"><i class="fa">&#xf002;</i>Recognize</button>
+            <button onclick="KanjiCanvas.erase('can')" title="(CTRL+X)"><i class="fa">&#xf12d;</i>Erase</button>
+            <button onclick="KanjiCanvas.deleteLast('can')" title="(CTRL+Z)"><i class="fa">&#xf0e2;</i>Undo</button>
+            <button onclick="KanjiCanvas.recognize('can')" title="(CTRL+F)"><i class="fa">&#xf002;</i>Recognize</button>
           </div>
           <div id="candidateList" class="kanji-canvas-candidates"></div>
         </div>

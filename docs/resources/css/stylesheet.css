@@ -147,7 +147,9 @@ button .fa {
 .kanji-canvas {
   background-color:#FFF;
   border:1px solid #333;
+  outline:none;
 }
+.kanji-canvas:focus { border-color:#36C; }
 
 .kanji-canvas-controls {
   font-size:0;
