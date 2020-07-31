@@ -932,8 +932,7 @@
 	}
 	*/
 	
-	KanjiCanvas.recognize = function (id) {
-		   
+    KanjiCanvas.recognize = function (id) {
       var mn = KanjiCanvas.momentNormalize(id);
 
       var extractedFeatures = KanjiCanvas.extractFeatures(mn, 20.);
@@ -944,17 +943,17 @@
       var candidates = KanjiCanvas.coarseClassification(extractedFeatures);
 
       KanjiCanvas.redraw(id);
-      
+
       // display candidates in the specified element
       if (KanjiCanvas["canvas_" + id].dataset.candidateList) {
         document.getElementById(KanjiCanvas["canvas_" + id].dataset.candidateList).innerHTML = KanjiCanvas.fineClassification(extractedFeatures, candidates);
       } 
-      
+
       // otherwise log the result to the console if no candidateList is specified
       else {
-        console.log(KanjiCanvas.fineClassification(extractedFeatures, candidates));
+        return KanjiCanvas.fineClassification(extractedFeatures, candidates);
       }
-	};
+    };
 	
 	/* test moment normalization 
 	function MomentTest() {
