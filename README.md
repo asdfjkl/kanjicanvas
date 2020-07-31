@@ -13,7 +13,7 @@ in client side only Javascript. Subjectively it provides much more robust recogn
 Try it out in your browser [HERE](https://asdfjkl.github.io/kanjicanvas/)!
 
 ## Usage
-To use Kanji Canvas on your website simply include the following javascript files which are located in the **docs/resources/javascript** folder.
+To use Kanji Canvas on your website simply include the following javascript files which are located in the [docs/resources/javascript](https://github.com/asdfjkl/kanjicanvas/tree/master/docs/resources/javascript) folder.
 
 ```html
 <script src="kanji-canvas.min.js"></script>
@@ -71,7 +71,9 @@ If you want to physically display the results on the page, you must specify the 
 <div id="candidateList"></div>
 ```
 
-Calling `recognize` like this will display the candidates inside of `#candidateList`. If `data-candidate-list` is not specified, the results are logged to the developer console.
+Calling `recognize` like this will display the candidates inside of `#candidateList`. 
+
+If `data-candidate-list` is not specified, the results are returned as a string for you to manipulate as you please.
 
 
 ### Adding New refPatterns
@@ -82,7 +84,7 @@ To add new refPatterns you must download [jTegaki](https://github.com/asdfjkl/ka
 3. Go to **File > Save Image** and save it as UNICODE.xml where UNICODE would be the unicode value you inserted for the background.
 4. Run **read_all.py** (which is included in this repo) to get the reference patterns from your xml file. (NOTE: you may need to change the directories for read_all.py to the folder where your xml file is saved)
   - `/home/user/code/convert/xmls` AND `/home/user/code/convert/xmls/`
-5. Once you have your refPattern you can add it to ref-patterns.js (located in the docs/resources/javascript folder)
+5. Once you have your refPattern you can add it to [ref-patterns.js](https://github.com/asdfjkl/kanjicanvas/blob/master/docs/resources/javascript/ref-patterns.js)
 
 If you want to create a new ref-patterns.js file, simply include the following and make sure to include your refPattern file after kanji-canvas.js in the document.
 
