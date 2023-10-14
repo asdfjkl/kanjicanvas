@@ -1,16 +1,17 @@
 import "./style.css";
 
-import { KANJI_DATA_SET } from "tegaki/dataset";
-import { recognize } from "tegaki/backend";
-import { createTegaki } from "tegaki/frontend";
+import { createTegaki } from "@tegaki/frontend";
 
 const tegaki = createTegaki(document);
 tegaki.init("tegaki-sample");
 
 const recognizeBtn = document.getElementById("recognize-btn")!;
-recognizeBtn.addEventListener("click", () => {
+recognizeBtn.addEventListener("click", async () => {
   const strokes = tegaki.getStrokes();
-  const candidate = recognize(strokes, KANJI_DATA_SET);
+  const candidate = await fetch("http://localhost:3000/recognize", {
+    method: "POST",
+    body: JSON.stringify({ strokes }),
+  }).then(res => res.json());
   const candidateContainer = document.getElementById("candidate-container")!;
   candidateContainer.textContent = candidate.join(", ");
 });
