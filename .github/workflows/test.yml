@@ -1,0 +1,27 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test_and_build_and:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 8
+      - name: install dependencies
+        run: pnpm i
+      - name: check spells
+        run: pnpm run spell-check
+      - name: check formats
+        run: pnpm run fmt .
+      - name: check lint
+        run: pnpm run lint .
+      - name: build
+        run: pnpm run build
