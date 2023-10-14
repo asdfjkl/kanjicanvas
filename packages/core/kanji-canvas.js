@@ -1,11 +1,11 @@
-(function (window, document) {
+export function KanjiCanvasFactory(document) {
   'use strict';
   
   // define KanjiCanvas as a global
   // call KanjiCanvas.init(id) to initialize a canvas as a KanjiCanvas
   // `id` must be the id attribute of the canvas.
   // ex: KanjiCanvas.init('canvas-1');
-  window.KanjiCanvas = new Object();
+	const KanjiCanvas = new Object();
   
   
   // patterns loaded externally from ref-patterns.js (always run after KanjiCanvas is defined)
@@ -1020,5 +1020,7 @@
           break;
       }
     }
-  });
-}(window, document));
+	});
+
+  return KanjiCanvas;
+}
