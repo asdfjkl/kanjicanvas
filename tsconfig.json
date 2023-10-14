@@ -14,5 +14,5 @@
   },
   "include": [
     "./packages/**/*.ts"
-  ]
+, "packages/frontend/next.js", "packages/frontend/index.js"  ]
 }
