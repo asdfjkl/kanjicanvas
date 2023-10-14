@@ -13,12 +13,8 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
     "paths": {
-      "@tegaki/*": [
-        "./packages/*"
-      ],
+      "@tegaki/*": ["./packages/*"]
     }
   },
-  "include": [
-    "./packages/**/*.ts"
-  ]
+  "include": ["./packages/**/*.ts"]
 }
