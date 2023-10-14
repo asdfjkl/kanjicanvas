@@ -1,138 +1,138 @@
-export function KanjiCanvasFactory(document) {
+export function OcrFactory(document) {
   'use strict';
   
-  // define KanjiCanvas as a global
-  // call KanjiCanvas.init(id) to initialize a canvas as a KanjiCanvas
+
+  // call Ocr.init(id) to initialize a canvas as a Ocr
   // `id` must be the id attribute of the canvas.
-  // ex: KanjiCanvas.init('canvas-1');
-	const KanjiCanvas = new Object();
+  // ex: Ocr.init('canvas-1');
+	const Ocr = new Object();
   
   
-  // patterns loaded externally from ref-patterns.js (always run after KanjiCanvas is defined)
-  KanjiCanvas.refPatterns = [];
+  // patterns loaded externally from ref-patterns.js (always run after Ocr is defined)
+  Ocr.refPatterns = [];
   
   
   // color coded stroke colors (for 30 strokes)
   // based on https://kanjivg.tagaini.net/viewer.html
-  KanjiCanvas.strokeColors = ['#bf0000', '#bf5600', '#bfac00', '#7cbf00', '#26bf00', '#00bf2f', '#00bf85', '#00a2bf', '#004cbf', '#0900bf', '#5f00bf', '#b500bf', '#bf0072', '#bf001c', '#bf2626', '#bf6b26', '#bfaf26', '#89bf26', '#44bf26', '#26bf4c', '#26bf91', '#26a8bf', '#2663bf', '#2d26bf', '#7226bf', '#b726bf', '#bf2682', '#bf263d', '#bf4c4c', '#bf804c'];
+  Ocr.strokeColors = ['#bf0000', '#bf5600', '#bfac00', '#7cbf00', '#26bf00', '#00bf2f', '#00bf85', '#00a2bf', '#004cbf', '#0900bf', '#5f00bf', '#b500bf', '#bf0072', '#bf001c', '#bf2626', '#bf6b26', '#bfaf26', '#89bf26', '#44bf26', '#26bf4c', '#26bf91', '#26a8bf', '#2663bf', '#2d26bf', '#7226bf', '#b726bf', '#bf2682', '#bf263d', '#bf4c4c', '#bf804c'];
   
   
   // init canvas
-  KanjiCanvas.init = function (id) {
-    KanjiCanvas["canvas_" + id] = document.getElementById(id);
-    KanjiCanvas["canvas_" + id].tabIndex = 0; // makes canvas focusable, allowing usage of shortcuts
-    KanjiCanvas["ctx_" + id] = KanjiCanvas["canvas_" + id].getContext("2d");
-    KanjiCanvas["w_" + id] = KanjiCanvas["canvas_" + id].width;
-    KanjiCanvas["h_" + id] = KanjiCanvas["canvas_" + id].height;
-    KanjiCanvas["flagOver_" + id] = false;
-    KanjiCanvas["flagDown_" + id] = false;
-    KanjiCanvas["prevX_" + id] = 0;
-    KanjiCanvas["currX_" + id] = 0;
-    KanjiCanvas["prevY_" + id] = 0;
-    KanjiCanvas["currY_" + id] = 0;
-    KanjiCanvas["dot_flag_" + id] = false;
-    KanjiCanvas["recordedPattern_" + id] = new Array();
-    KanjiCanvas["currentLine_" + id] = null;
+  Ocr.init = function (id) {
+    Ocr["canvas_" + id] = document.getElementById(id);
+    Ocr["canvas_" + id].tabIndex = 0; // makes canvas focusable, allowing usage of shortcuts
+    Ocr["ctx_" + id] = Ocr["canvas_" + id].getContext("2d");
+    Ocr["w_" + id] = Ocr["canvas_" + id].width;
+    Ocr["h_" + id] = Ocr["canvas_" + id].height;
+    Ocr["flagOver_" + id] = false;
+    Ocr["flagDown_" + id] = false;
+    Ocr["prevX_" + id] = 0;
+    Ocr["currX_" + id] = 0;
+    Ocr["prevY_" + id] = 0;
+    Ocr["currY_" + id] = 0;
+    Ocr["dot_flag_" + id] = false;
+    Ocr["recordedPattern_" + id] = new Array();
+    Ocr["currentLine_" + id] = null;
     
-    KanjiCanvas["canvas_" + id].addEventListener("mousemove", function (e) {
-      KanjiCanvas.findxy('move', e, id)
+    Ocr["canvas_" + id].addEventListener("mousemove", function (e) {
+      Ocr.findxy('move', e, id)
     }, false);
-    KanjiCanvas["canvas_" + id].addEventListener("mousedown", function (e) {
-      KanjiCanvas.findxy('down', e, id)
+    Ocr["canvas_" + id].addEventListener("mousedown", function (e) {
+      Ocr.findxy('down', e, id)
     }, false);
-    KanjiCanvas["canvas_" + id].addEventListener("mouseup", function (e) {
-      KanjiCanvas.findxy('up', e, id)
+    Ocr["canvas_" + id].addEventListener("mouseup", function (e) {
+      Ocr.findxy('up', e, id)
     }, false);
-    KanjiCanvas["canvas_" + id].addEventListener("mouseout", function (e) {
-      KanjiCanvas.findxy('out', e, id)
+    Ocr["canvas_" + id].addEventListener("mouseout", function (e) {
+      Ocr.findxy('out', e, id)
     }, false);
-	KanjiCanvas["canvas_" + id].addEventListener("mouseover", function (e) {
-      KanjiCanvas.findxy('over', e, id)
+	Ocr["canvas_" + id].addEventListener("mouseover", function (e) {
+      Ocr.findxy('over', e, id)
     }, false);
     
     // touch events
-    KanjiCanvas["canvas_" + id].addEventListener("touchmove", function (e) {
-      KanjiCanvas.findxy('move', e, id);
+    Ocr["canvas_" + id].addEventListener("touchmove", function (e) {
+      Ocr.findxy('move', e, id);
     }, false);
-    KanjiCanvas["canvas_" + id].addEventListener("touchstart", function (e) {
-      KanjiCanvas.findxy('down', e, id);
+    Ocr["canvas_" + id].addEventListener("touchstart", function (e) {
+      Ocr.findxy('down', e, id);
     }, false);
-    KanjiCanvas["canvas_" + id].addEventListener("touchend", function (e) {
-      KanjiCanvas.findxy('up', e, id);
+    Ocr["canvas_" + id].addEventListener("touchend", function (e) {
+      Ocr.findxy('up', e, id);
     }, false);
   };
 
-  KanjiCanvas.draw = function (id, color) {
-    KanjiCanvas["ctx_" + id].beginPath();
-    KanjiCanvas["ctx_" + id].moveTo(KanjiCanvas["prevX_" + id], KanjiCanvas["prevY_" + id]);
-    KanjiCanvas["ctx_" + id].lineTo(KanjiCanvas["currX_" + id], KanjiCanvas["currY_" + id]);
-    KanjiCanvas["ctx_" + id].strokeStyle = color ? color : "#333";
-    KanjiCanvas["ctx_" + id].lineCap = "round";
-    //KanjiCanvas["ctx_" + id].lineJoin = "round";
-    //KanjiCanvas["ctx_" + id].lineMiter = "round";
-    KanjiCanvas["ctx_" + id].lineWidth = 4;
-    KanjiCanvas["ctx_" + id].stroke();
-    KanjiCanvas["ctx_" + id].closePath();
+  Ocr.draw = function (id, color) {
+    Ocr["ctx_" + id].beginPath();
+    Ocr["ctx_" + id].moveTo(Ocr["prevX_" + id], Ocr["prevY_" + id]);
+    Ocr["ctx_" + id].lineTo(Ocr["currX_" + id], Ocr["currY_" + id]);
+    Ocr["ctx_" + id].strokeStyle = color ? color : "#333";
+    Ocr["ctx_" + id].lineCap = "round";
+    //Ocr["ctx_" + id].lineJoin = "round";
+    //Ocr["ctx_" + id].lineMiter = "round";
+    Ocr["ctx_" + id].lineWidth = 4;
+    Ocr["ctx_" + id].stroke();
+    Ocr["ctx_" + id].closePath();
   };
 
-  KanjiCanvas.deleteLast = function (id) {
-    KanjiCanvas["ctx_" + id].clearRect(0, 0, KanjiCanvas["w_" + id], KanjiCanvas["h_" + id]);
-    for(var i = 0;i<KanjiCanvas["recordedPattern_" + id].length-1;i++) {
-      var stroke_i = KanjiCanvas["recordedPattern_" + id][i];
+  Ocr.deleteLast = function (id) {
+    Ocr["ctx_" + id].clearRect(0, 0, Ocr["w_" + id], Ocr["h_" + id]);
+    for(var i = 0;i<Ocr["recordedPattern_" + id].length-1;i++) {
+      var stroke_i = Ocr["recordedPattern_" + id][i];
       for(var j = 0; j<stroke_i.length-1;j++) {
-        KanjiCanvas["prevX_" + id] = stroke_i[j][0];
-        KanjiCanvas["prevY_" + id] = stroke_i[j][1];
+        Ocr["prevX_" + id] = stroke_i[j][0];
+        Ocr["prevY_" + id] = stroke_i[j][1];
 
-        KanjiCanvas["currX_" + id] = stroke_i[j+1][0];
-        KanjiCanvas["currY_" + id] = stroke_i[j+1][1];
-        KanjiCanvas.draw(id);
+        Ocr["currX_" + id] = stroke_i[j+1][0];
+        Ocr["currY_" + id] = stroke_i[j+1][1];
+        Ocr.draw(id);
       }
     }
-    KanjiCanvas["recordedPattern_" + id].pop();
+    Ocr["recordedPattern_" + id].pop();
   };
 
-  KanjiCanvas.erase = function (id) {
-    KanjiCanvas["ctx_" + id].clearRect(0, 0, KanjiCanvas["w_" + id], KanjiCanvas["h_" + id]);
-    KanjiCanvas["recordedPattern_" + id].length = 0;
+  Ocr.erase = function (id) {
+    Ocr["ctx_" + id].clearRect(0, 0, Ocr["w_" + id], Ocr["h_" + id]);
+    Ocr["recordedPattern_" + id].length = 0;
   };
 
-  KanjiCanvas.findxy = function (res, e, id) {
+  Ocr.findxy = function (res, e, id) {
     var touch = e.changedTouches ? e.changedTouches[0] : null;
     
     if (touch) e.preventDefault(); // prevent scrolling while drawing to the canvas
     
     if (res == 'down') {
-      var rect = KanjiCanvas["canvas_" + id].getBoundingClientRect();
-      KanjiCanvas["prevX_" + id] = KanjiCanvas["currX_" + id];
-      KanjiCanvas["prevY_" + id] = KanjiCanvas["currY_" + id];
-      KanjiCanvas["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
-      KanjiCanvas["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
-      KanjiCanvas["currentLine_" + id] = new Array();
-      KanjiCanvas["currentLine_" + id].push([KanjiCanvas["currX_" + id], KanjiCanvas["currY_" + id]]);
+      var rect = Ocr["canvas_" + id].getBoundingClientRect();
+      Ocr["prevX_" + id] = Ocr["currX_" + id];
+      Ocr["prevY_" + id] = Ocr["currY_" + id];
+      Ocr["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
+      Ocr["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
+      Ocr["currentLine_" + id] = new Array();
+      Ocr["currentLine_" + id].push([Ocr["currX_" + id], Ocr["currY_" + id]]);
 
-      KanjiCanvas["flagDown_" + id] = true;
-	  KanjiCanvas["flagOver_" + id] = true;
-      KanjiCanvas["dot_flag_" + id] = true;
-      if (KanjiCanvas["dot_flag_" + id]) {
-        KanjiCanvas["ctx_" + id].beginPath();
-        KanjiCanvas["ctx_" + id].fillRect(KanjiCanvas["currX_" + id], KanjiCanvas["currY_" + id], 2, 2);
-        KanjiCanvas["ctx_" + id].closePath();
-        KanjiCanvas["dot_flag_" + id] = false;
+      Ocr["flagDown_" + id] = true;
+	  Ocr["flagOver_" + id] = true;
+      Ocr["dot_flag_" + id] = true;
+      if (Ocr["dot_flag_" + id]) {
+        Ocr["ctx_" + id].beginPath();
+        Ocr["ctx_" + id].fillRect(Ocr["currX_" + id], Ocr["currY_" + id], 2, 2);
+        Ocr["ctx_" + id].closePath();
+        Ocr["dot_flag_" + id] = false;
       }
     }
     if (res == 'up') {
-      KanjiCanvas["flagDown_" + id] = false;
-	  if(KanjiCanvas["flagOver_" + id] == true) {
-          KanjiCanvas["recordedPattern_" + id].push(KanjiCanvas["currentLine_" + id]);
+      Ocr["flagDown_" + id] = false;
+	  if(Ocr["flagOver_" + id] == true) {
+          Ocr["recordedPattern_" + id].push(Ocr["currentLine_" + id]);
 	  }
     }
 
     if (res == "out") {
-      KanjiCanvas["flagOver_" + id] = false;
-	  if(KanjiCanvas["flagDown_" + id] == true) {
-	      KanjiCanvas["recordedPattern_" + id].push(KanjiCanvas["currentLine_" + id]);
+      Ocr["flagOver_" + id] = false;
+	  if(Ocr["flagDown_" + id] == true) {
+	      Ocr["recordedPattern_" + id].push(Ocr["currentLine_" + id]);
 	  }
-	  KanjiCanvas["flagDown_" + id] = false;
+	  Ocr["flagDown_" + id] = false;
     }
 	
 	/*
@@ -141,64 +141,64 @@ export function KanjiCanvasFactory(document) {
 	*/
 
     if (res == 'move') {
-      if (KanjiCanvas["flagOver_" + id] && KanjiCanvas["flagDown_" + id]) {
-        var rect = KanjiCanvas["canvas_" + id].getBoundingClientRect();
-        KanjiCanvas["prevX_" + id] = KanjiCanvas["currX_" + id];
-        KanjiCanvas["prevY_" + id] = KanjiCanvas["currY_" + id];
-        KanjiCanvas["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
-        KanjiCanvas["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
-        KanjiCanvas["currentLine_" + id].push([KanjiCanvas["prevX_" + id], KanjiCanvas["prevY_" + id]]);
-        KanjiCanvas["currentLine_" + id].push([KanjiCanvas["currX_" + id], KanjiCanvas["currY_" + id]]);
-        KanjiCanvas.draw(id);
+      if (Ocr["flagOver_" + id] && Ocr["flagDown_" + id]) {
+        var rect = Ocr["canvas_" + id].getBoundingClientRect();
+        Ocr["prevX_" + id] = Ocr["currX_" + id];
+        Ocr["prevY_" + id] = Ocr["currY_" + id];
+        Ocr["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
+        Ocr["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
+        Ocr["currentLine_" + id].push([Ocr["prevX_" + id], Ocr["prevY_" + id]]);
+        Ocr["currentLine_" + id].push([Ocr["currX_" + id], Ocr["currY_" + id]]);
+        Ocr.draw(id);
       }
     }
   };
 
   // redraw to current canvas according to 
-  // what is currently stored in KanjiCanvas["recordedPattern_" + id]
+  // what is currently stored in Ocr["recordedPattern_" + id]
   // add numbers to each stroke
-  KanjiCanvas.redraw = function (id) {
-    KanjiCanvas["ctx_" + id].clearRect(0, 0, KanjiCanvas["w_" + id], KanjiCanvas["h_" + id]);
+  Ocr.redraw = function (id) {
+    Ocr["ctx_" + id].clearRect(0, 0, Ocr["w_" + id], Ocr["h_" + id]);
 
     // draw strokes
-    for(var i = 0;i<KanjiCanvas["recordedPattern_" + id].length;i++) {
-      var stroke_i = KanjiCanvas["recordedPattern_" + id][i];
+    for(var i = 0;i<Ocr["recordedPattern_" + id].length;i++) {
+      var stroke_i = Ocr["recordedPattern_" + id][i];
 
       for(var j = 0; j<stroke_i.length-1;j++) {
-        KanjiCanvas["prevX_" + id] = stroke_i[j][0];
-        KanjiCanvas["prevY_" + id] = stroke_i[j][1];
+        Ocr["prevX_" + id] = stroke_i[j][0];
+        Ocr["prevY_" + id] = stroke_i[j][1];
 
-        KanjiCanvas["currX_" + id] = stroke_i[j+1][0];
-        KanjiCanvas["currY_" + id] = stroke_i[j+1][1];
-        KanjiCanvas.draw(id, KanjiCanvas.strokeColors[i]);
+        Ocr["currX_" + id] = stroke_i[j+1][0];
+        Ocr["currY_" + id] = stroke_i[j+1][1];
+        Ocr.draw(id, Ocr.strokeColors[i]);
       }
     }
 
     // draw stroke numbers
-    if (KanjiCanvas["canvas_" + id].dataset.strokeNumbers != 'false') {
-      for(var i = 0;i<KanjiCanvas["recordedPattern_" + id].length;i++) {
-        var stroke_i = KanjiCanvas["recordedPattern_" + id][i],
+    if (Ocr["canvas_" + id].dataset.strokeNumbers != 'false') {
+      for(var i = 0;i<Ocr["recordedPattern_" + id].length;i++) {
+        var stroke_i = Ocr["recordedPattern_" + id][i],
             x = stroke_i[Math.floor(stroke_i.length/2)][0] + 5,
             y = stroke_i[Math.floor(stroke_i.length/2)][1] - 5;
 
-        KanjiCanvas["ctx_" + id].font = "20px Arial";
+        Ocr["ctx_" + id].font = "20px Arial";
 
         // outline
-        KanjiCanvas["ctx_" + id].lineWidth = 3;
-        KanjiCanvas["ctx_" + id].strokeStyle = KanjiCanvas.alterHex(KanjiCanvas.strokeColors[i] ? KanjiCanvas.strokeColors[i] : "#333333", 60, 'dec');
-        KanjiCanvas["ctx_" + id].strokeText((i + 1).toString(), x, y);
+        Ocr["ctx_" + id].lineWidth = 3;
+        Ocr["ctx_" + id].strokeStyle = Ocr.alterHex(Ocr.strokeColors[i] ? Ocr.strokeColors[i] : "#333333", 60, 'dec');
+        Ocr["ctx_" + id].strokeText((i + 1).toString(), x, y);
 
         // fill
-        KanjiCanvas["ctx_" + id].fillStyle = KanjiCanvas.strokeColors[i] ? KanjiCanvas.strokeColors[i] : "#333";
-        KanjiCanvas["ctx_" + id].fillText((i + 1).toString(), x, y);
+        Ocr["ctx_" + id].fillStyle = Ocr.strokeColors[i] ? Ocr.strokeColors[i] : "#333";
+        Ocr["ctx_" + id].fillText((i + 1).toString(), x, y);
       }
     }
   };
   
   
   // modifies hex colors to darken or lighten them
-  // ex: KanjiCanvas.alterHex(KanjiCanvas.strokeColors[0], 60, 'dec'); // decrement all colors by 60 (use 'inc' to increment)
-  KanjiCanvas.alterHex = function (hex, number, action) {
+  // ex: Ocr.alterHex(Ocr.strokeColors[0], 60, 'dec'); // decrement all colors by 60 (use 'inc' to increment)
+  Ocr.alterHex = function (hex, number, action) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex),
         color = [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)],
         i = 0, j = color.length;
@@ -225,58 +225,58 @@ export function KanjiCanvasFactory(document) {
   };
   
 
-  // linear normalization for KanjiCanvas["recordedPattern_" + id]
-  KanjiCanvas.normalizeLinear = function (id) {
+  // linear normalization for Ocr["recordedPattern_" + id]
+  Ocr.normalizeLinear = function (id) {
 
     var normalizedPattern = new Array();
-    KanjiCanvas.newHeight = 256;
-    KanjiCanvas.newWidth = 256;
-    KanjiCanvas.xMin = 256;
-    KanjiCanvas.xMax = 0;
-    KanjiCanvas.yMin = 256;
-    KanjiCanvas.yMax = 0;
+    Ocr.newHeight = 256;
+    Ocr.newWidth = 256;
+    Ocr.xMin = 256;
+    Ocr.xMax = 0;
+    Ocr.yMin = 256;
+    Ocr.yMax = 0;
     // first determine drawn character width / length
-    for(var i = 0;i<KanjiCanvas["recordedPattern_" + id].length;i++) {
-      var stroke_i = KanjiCanvas["recordedPattern_" + id][i];
+    for(var i = 0;i<Ocr["recordedPattern_" + id].length;i++) {
+      var stroke_i = Ocr["recordedPattern_" + id][i];
       for(var j = 0; j<stroke_i.length;j++) {
-        KanjiCanvas.x = stroke_i[j][0];
-        KanjiCanvas.y = stroke_i[j][1];
-        if(KanjiCanvas.x < KanjiCanvas.xMin) {
-          KanjiCanvas.xMin = KanjiCanvas.x;
+        Ocr.x = stroke_i[j][0];
+        Ocr.y = stroke_i[j][1];
+        if(Ocr.x < Ocr.xMin) {
+          Ocr.xMin = Ocr.x;
         }
-        if(KanjiCanvas.x > KanjiCanvas.xMax) {
-          KanjiCanvas.xMax = KanjiCanvas.x;
+        if(Ocr.x > Ocr.xMax) {
+          Ocr.xMax = Ocr.x;
         }
-        if(KanjiCanvas.y < KanjiCanvas.yMin) {
-          KanjiCanvas.yMin = KanjiCanvas.y;
+        if(Ocr.y < Ocr.yMin) {
+          Ocr.yMin = Ocr.y;
         }
-        if(KanjiCanvas.y > KanjiCanvas.yMax) {
-          KanjiCanvas.yMax = KanjiCanvas.y;
+        if(Ocr.y > Ocr.yMax) {
+          Ocr.yMax = Ocr.y;
         }
       }
     }	
-    KanjiCanvas.oldHeight = Math.abs(KanjiCanvas.yMax - KanjiCanvas.yMin);
-    KanjiCanvas.oldWidth  = Math.abs(KanjiCanvas.xMax - KanjiCanvas.xMin);
+    Ocr.oldHeight = Math.abs(Ocr.yMax - Ocr.yMin);
+    Ocr.oldWidth  = Math.abs(Ocr.xMax - Ocr.xMin);
 
-    for(var i = 0;i<KanjiCanvas["recordedPattern_" + id].length;i++) {
-      var stroke_i = KanjiCanvas["recordedPattern_" + id][i];
+    for(var i = 0;i<Ocr["recordedPattern_" + id].length;i++) {
+      var stroke_i = Ocr["recordedPattern_" + id][i];
       var normalized_stroke_i = new Array();
       for(var j = 0; j<stroke_i.length;j++) {
-        KanjiCanvas.x = stroke_i[j][0];
-        KanjiCanvas.y = stroke_i[j][1];
-        KanjiCanvas.xNorm = (KanjiCanvas.x - KanjiCanvas.xMin) * (KanjiCanvas.newWidth / KanjiCanvas.oldWidth) ;
-        KanjiCanvas.yNorm= (KanjiCanvas.y - KanjiCanvas.yMin) * (KanjiCanvas.newHeight / KanjiCanvas.oldHeight);
-        normalized_stroke_i.push([KanjiCanvas.xNorm, KanjiCanvas.yNorm]);
+        Ocr.x = stroke_i[j][0];
+        Ocr.y = stroke_i[j][1];
+        Ocr.xNorm = (Ocr.x - Ocr.xMin) * (Ocr.newWidth / Ocr.oldWidth) ;
+        Ocr.yNorm= (Ocr.y - Ocr.yMin) * (Ocr.newHeight / Ocr.oldHeight);
+        normalized_stroke_i.push([Ocr.xNorm, Ocr.yNorm]);
       }
       normalizedPattern.push(normalized_stroke_i);
     }
-    KanjiCanvas["recordedPattern_" + id] = normalizedPattern;
-    KanjiCanvas.redraw(id);
+    Ocr["recordedPattern_" + id] = normalizedPattern;
+    Ocr.redraw(id);
   };
   
    // helper functions for moment normalization 
 
-   KanjiCanvas.m10 = function (pattern) {
+   Ocr.m10 = function (pattern) {
 		var sum = 0;
 		for(var i=0;i<pattern.length;i++) {
 		    var stroke_i = pattern[i];
@@ -287,7 +287,7 @@ export function KanjiCanvasFactory(document) {
 		return sum;
 	};
 	
-    KanjiCanvas.m01 = function (pattern) {
+    Ocr.m01 = function (pattern) {
 		var sum = 0;
 		for(var i=0;i<pattern.length;i++) {
 			var stroke_i = pattern[i];
@@ -298,7 +298,7 @@ export function KanjiCanvasFactory(document) {
 		return sum;
 	};
 		
-    KanjiCanvas.m00 = function (pattern) {
+    Ocr.m00 = function (pattern) {
 	    var sum = 0;
 		for(var i=0;i<pattern.length;i++) {
 		   var stroke_i = pattern[i];
@@ -307,7 +307,7 @@ export function KanjiCanvasFactory(document) {
 		return sum;
 	};
 	
-	 KanjiCanvas.mu20 = function (pattern, xc) {
+	 Ocr.mu20 = function (pattern, xc) {
 		var sum = 0;
 		for(var i=0;i<pattern.length;i++) {
 			var stroke_i = pattern[i];
@@ -319,7 +319,7 @@ export function KanjiCanvasFactory(document) {
 		return sum;
 	};
 	
-	 KanjiCanvas.mu02 = function (pattern, yc) {
+	 Ocr.mu02 = function (pattern, yc) {
 		var sum = 0;
 		for(var i=0;i<pattern.length;i++) {
 			var stroke_i = pattern[i];
@@ -331,7 +331,7 @@ export function KanjiCanvasFactory(document) {
 		return sum;
 	};
    
-   	 KanjiCanvas.aran = function (width, height) {
+   	 Ocr.aran = function (width, height) {
 		
 		var r1 = 0.;
 		if(height > width) {
@@ -350,7 +350,7 @@ export function KanjiCanvasFactory(document) {
 		return r2;
 	};
 	
-	 KanjiCanvas.chopOverbounds = function (pattern) {
+	 Ocr.chopOverbounds = function (pattern) {
 		
 		var chopped = new Array();
 		for(var i=0;i<pattern.length;i++) {
@@ -370,7 +370,7 @@ export function KanjiCanvasFactory(document) {
 		return chopped;		
 	};
 	
-    KanjiCanvas.transform = function (pattern, x_, y_) {
+    Ocr.transform = function (pattern, x_, y_) {
 	var pt = new Array();
 		for(var i=0;i<pattern.length;i++) {
 		    var stroke_i = pattern[i];
@@ -386,54 +386,54 @@ export function KanjiCanvasFactory(document) {
 	};
 
 	// main function for moment normalization
-	KanjiCanvas.momentNormalize = function (id) {
+	Ocr.momentNormalize = function (id) {
 			
-		KanjiCanvas.newHeight = 256;
-		KanjiCanvas.newWidth = 256;
-		KanjiCanvas.xMin = 256;
-		KanjiCanvas.xMax = 0;
-		KanjiCanvas.yMin = 256;
-		KanjiCanvas.yMax = 0;
+		Ocr.newHeight = 256;
+		Ocr.newWidth = 256;
+		Ocr.xMin = 256;
+		Ocr.xMax = 0;
+		Ocr.yMin = 256;
+		Ocr.yMax = 0;
 		// first determine drawn character width / length
-		for(var i = 0;i<KanjiCanvas["recordedPattern_" + id].length;i++) {
-		  var stroke_i = KanjiCanvas["recordedPattern_" + id][i];
+		for(var i = 0;i<Ocr["recordedPattern_" + id].length;i++) {
+		  var stroke_i = Ocr["recordedPattern_" + id][i];
 		  for(var j = 0; j<stroke_i.length;j++) {
-			KanjiCanvas.x = stroke_i[j][0];
-			KanjiCanvas.y = stroke_i[j][1];
-			if(KanjiCanvas.x < KanjiCanvas.xMin) {
-			  KanjiCanvas.xMin = KanjiCanvas.x;
+			Ocr.x = stroke_i[j][0];
+			Ocr.y = stroke_i[j][1];
+			if(Ocr.x < Ocr.xMin) {
+			  Ocr.xMin = Ocr.x;
 			}
-			if(KanjiCanvas.x > KanjiCanvas.xMax) {
-			  KanjiCanvas.xMax = KanjiCanvas.x;
+			if(Ocr.x > Ocr.xMax) {
+			  Ocr.xMax = Ocr.x;
 			}
-			if(KanjiCanvas.y < KanjiCanvas.yMin) {
-			  KanjiCanvas.yMin = KanjiCanvas.y;
+			if(Ocr.y < Ocr.yMin) {
+			  Ocr.yMin = Ocr.y;
 			}
-			if(KanjiCanvas.y > KanjiCanvas.yMax) {
-			  KanjiCanvas.yMax = KanjiCanvas.y;
+			if(Ocr.y > Ocr.yMax) {
+			  Ocr.yMax = Ocr.y;
 			}
 		  }
 		}	
-		KanjiCanvas.oldHeight = Math.abs(KanjiCanvas.yMax - KanjiCanvas.yMin);
-		KanjiCanvas.oldWidth  = Math.abs(KanjiCanvas.xMax - KanjiCanvas.xMin);
+		Ocr.oldHeight = Math.abs(Ocr.yMax - Ocr.yMin);
+		Ocr.oldWidth  = Math.abs(Ocr.xMax - Ocr.xMin);
 			
-		var r2 = KanjiCanvas.aran(KanjiCanvas.oldWidth, KanjiCanvas.oldHeight);
+		var r2 = Ocr.aran(Ocr.oldWidth, Ocr.oldHeight);
 		
-		var aranWidth = KanjiCanvas.newWidth;
-		var aranHeight = KanjiCanvas.newHeight;
+		var aranWidth = Ocr.newWidth;
+		var aranHeight = Ocr.newHeight;
 		
-		if(KanjiCanvas.oldHeight > KanjiCanvas.oldWidth) {
-			aranWidth = r2 * KanjiCanvas.newWidth; 
+		if(Ocr.oldHeight > Ocr.oldWidth) {
+			aranWidth = r2 * Ocr.newWidth; 
 		} else {
-			aranHeight = r2 * KanjiCanvas.newHeight;
+			aranHeight = r2 * Ocr.newHeight;
 		}		
 				
-		var xOffset = (KanjiCanvas.newWidth - aranWidth)/2;
-		var yOffset = (KanjiCanvas.newHeight - aranHeight)/2; 
+		var xOffset = (Ocr.newWidth - aranWidth)/2;
+		var yOffset = (Ocr.newHeight - aranHeight)/2; 
 		
-		var m00_ = KanjiCanvas.m00(KanjiCanvas["recordedPattern_" + id]);
-		var m01_ = KanjiCanvas.m01(KanjiCanvas["recordedPattern_" + id]);
-		var m10_ = KanjiCanvas.m10(KanjiCanvas["recordedPattern_" + id]);
+		var m00_ = Ocr.m00(Ocr["recordedPattern_" + id]);
+		var m01_ = Ocr.m01(Ocr["recordedPattern_" + id]);
+		var m10_ = Ocr.m10(Ocr["recordedPattern_" + id]);
 				
 		var xc_ = (m10_/m00_);
 		var yc_ = (m01_/m00_);
@@ -441,15 +441,15 @@ export function KanjiCanvasFactory(document) {
 		var xc_half = aranWidth/2;
 		var yc_half = aranHeight/2;
 		
-		var mu20_ = KanjiCanvas.mu20(KanjiCanvas["recordedPattern_" + id], xc_);
-		var mu02_ = KanjiCanvas.mu02(KanjiCanvas["recordedPattern_" + id], yc_);
+		var mu20_ = Ocr.mu20(Ocr["recordedPattern_" + id], xc_);
+		var mu02_ = Ocr.mu02(Ocr["recordedPattern_" + id], yc_);
 
 		var alpha = (aranWidth) / (4 * Math.sqrt(mu20_/m00_)) || 0;
 		var beta = (aranHeight) / (4 * Math.sqrt(mu02_/m00_)) || 0;
 			
 		var nf = new Array();
-		for(var i=0;i<KanjiCanvas["recordedPattern_" + id].length;i++) {
-			var si = KanjiCanvas["recordedPattern_" + id][i];
+		for(var i=0;i<Ocr["recordedPattern_" + id].length;i++) {
+			var si = Ocr["recordedPattern_" + id][i];
 			var nsi = new Array();
 			for(var j=0;j<si.length;j++) {
 				
@@ -461,11 +461,11 @@ export function KanjiCanvasFactory(document) {
 			nf.push(nsi);
 		}
 
-		return KanjiCanvas.transform(nf, xOffset, yOffset);
+		return Ocr.transform(nf, xOffset, yOffset);
 	};
 	
   // distance functions
-  KanjiCanvas.euclid = function (x1y1, x2y2) {
+  Ocr.euclid = function (x1y1, x2y2) {
       var a = x1y1[0] - x2y2[0];
       var b = x1y1[1] - x2y2[1];
       var c = Math.sqrt( a*a + b*b );
@@ -473,11 +473,11 @@ export function KanjiCanvasFactory(document) {
   };
 
   // extract points in regular intervals
-  KanjiCanvas.extractFeatures = function (kanji, interval) {
+  Ocr.extractFeatures = function (input_data, interval) {
       var extractedPattern = new Array();
-      var nrStrokes = kanji.length;
+      var nrStrokes = input_data.length;
 	  for(var i = 0;i<nrStrokes;i++) {
-	      var stroke_i = kanji[i];
+	      var stroke_i = input_data[i];
 		  var extractedStroke_i = new Array();
 		  var dist = 0.0;
 	      var j = 0;
@@ -490,7 +490,7 @@ export function KanjiCanvasFactory(document) {
 		      if(j > 0) {
 			      var x1y1 = stroke_i[j-1];
 				  var x2y2 = stroke_i[j];
-		          dist += KanjiCanvas.euclid(x1y1, x2y2);
+		          dist += Ocr.euclid(x1y1, x2y2);
               }
 			  if((dist >= interval) && (j>1)) {
 			      dist = dist - interval;
@@ -515,19 +515,19 @@ export function KanjiCanvasFactory(document) {
    };
    
    /* test extraction function
-   KanjiCanvas.extractTest = function () {
-      //var ex = KanjiCanvas.extractFeatures(KanjiCanvas["recordedPattern_" + id], 20.);
-	  //KanjiCanvas["recordedPattern_" + id] = ex;
+   Ocr.extractTest = function () {
+      //var ex = Ocr.extractFeatures(Ocr["recordedPattern_" + id], 20.);
+	  //Ocr["recordedPattern_" + id] = ex;
 
-      //KanjiCanvas.redraw(id);
+      //Ocr.redraw(id);
 	  
 	  var norm = normalizeLinearTest(test4);
-	  var ex = KanjiCanvas.extractFeatures(norm, 20.);
+	  var ex = Ocr.extractFeatures(norm, 20.);
 	  //console.log(ex);
 	  
    }*/
    
-   KanjiCanvas.endPointDistance = function (pattern1, pattern2) {
+   Ocr.endPointDistance = function (pattern1, pattern2) {
        var dist = 0;
 	   var l1 = typeof pattern1 == 'undefined' ? 0 : pattern1.length;
 	   var l2 = typeof pattern2 == 'undefined' ? 0 : pattern2.length;
@@ -544,7 +544,7 @@ export function KanjiCanvasFactory(document) {
 	   return dist;
    };
    
-   KanjiCanvas.initialDistance = function (pattern1, pattern2) {
+   Ocr.initialDistance = function (pattern1, pattern2) {
        var l1 = pattern1.length;
 	   var l2 = pattern2.length;
 	   var lmin = Math.min(l1,l2);
@@ -562,7 +562,7 @@ export function KanjiCanvasFactory(document) {
    // and return quadruple with sorted patterns and their
    // stroke numbers [k1,k2,n,m] where n >= m and 
    // they denote the #of strokes of k1 and k2
-   KanjiCanvas.getLargerAndSize = function (pattern1, pattern2) {
+   Ocr.getLargerAndSize = function (pattern1, pattern2) {
 	   var l1 = typeof pattern1 == 'undefined' ? 0 : pattern1.length;
 	   var l2 = typeof pattern2 == 'undefined' ? 0 : pattern2.length;
 	   // definitions as in paper 
@@ -580,14 +580,14 @@ export function KanjiCanvasFactory(document) {
        return [k1,k2,n,m];
    };
    
-   KanjiCanvas.wholeWholeDistance = function (pattern1, pattern2) {
+   Ocr.wholeWholeDistance = function (pattern1, pattern2) {
        // [k1, k2, n, m]
        // a[0], a[1], a[2], a[3]
-       var a = KanjiCanvas.getLargerAndSize(pattern1, pattern2);
+       var a = Ocr.getLargerAndSize(pattern1, pattern2);
 	   var dist = 0;
 	   for(var i = 0; i<a[3];i++) {
-	       KanjiCanvas.j_of_i = parseInt(parseInt(a[2]/a[3]) * i);
-		   var x1y1 = a[0][KanjiCanvas.j_of_i];
+	       Ocr.j_of_i = parseInt(parseInt(a[2]/a[3]) * i);
+		   var x1y1 = a[0][Ocr.j_of_i];
 		   var x2y2 = a[1][i];
 	       dist += (Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]));
 	   }
@@ -595,10 +595,10 @@ export function KanjiCanvasFactory(document) {
    };
    
    // initialize N-stroke map by greedy initialization
-   KanjiCanvas.initStrokeMap = function (pattern1, pattern2, distanceMetric) {
+   Ocr.initStrokeMap = function (pattern1, pattern2, distanceMetric) {
        // [k1, k2, n, m]
        // a[0], a[1], a[2], a[3]
-	   var a = KanjiCanvas.getLargerAndSize(pattern1, pattern2);
+	   var a = Ocr.getLargerAndSize(pattern1, pattern2);
 	   // larger is now k1 with length n
 	   var map = new Array();
 	   for(var i=0;i<a[2];i++) {
@@ -609,35 +609,35 @@ export function KanjiCanvasFactory(document) {
 	      free[i] = true;
 	   }
 	   for(var i=0;i<a[3];i++) {
-           KanjiCanvas.minDist = 10000000;
-		   KanjiCanvas.min_j = -1;
+           Ocr.minDist = 10000000;
+		   Ocr.min_j = -1;
 		   for(var j=0;j<a[2];j++) {
 		       if(free[j] == true) {
 			       var d = distanceMetric(a[0][j],a[1][i]);
-  			       if(d < KanjiCanvas.minDist) {
-				       KanjiCanvas.minDist = d;
-					   KanjiCanvas.min_j = j;
+  			       if(d < Ocr.minDist) {
+				       Ocr.minDist = d;
+					   Ocr.min_j = j;
 			       }
 			   }
 		   }
-		   free[KanjiCanvas.min_j] = false;
-           map[KanjiCanvas.min_j] = i;
+		   free[Ocr.min_j] = false;
+           map[Ocr.min_j] = i;
        }	   
 	   return map;   
     };
 
 	// get best N-stroke map by iterative improvement
-	KanjiCanvas.getMap = function (pattern1, pattern2, distanceMetric) {
+	Ocr.getMap = function (pattern1, pattern2, distanceMetric) {
        // [k1, k2, n, m]
        // a[0], a[1], a[2], a[3]
-       var a = KanjiCanvas.getLargerAndSize(pattern1, pattern2);
+       var a = Ocr.getLargerAndSize(pattern1, pattern2);
 	   // larger is now k1 with length n
 	   var L = 3;
-	   var map = KanjiCanvas.initStrokeMap(a[0], a[1], distanceMetric);
+	   var map = Ocr.initStrokeMap(a[0], a[1], distanceMetric);
 	   for(var l=0;l<L;l++) {
 	       for(var i=0;i<map.length;i++) {
 		       if(map[i] != -1) {
-                   KanjiCanvas.dii = distanceMetric(a[0][i], a[1][map[i]]);
+                   Ocr.dii = distanceMetric(a[0][i], a[1][map[i]]);
 				   for(var j=0;j<map.length;j++) {
 				       // we need to check again, since 
 					   // manipulation of map[i] can occur within
@@ -647,18 +647,18 @@ export function KanjiCanvasFactory(document) {
 						      var djj = distanceMetric(a[0][j],a[1][map[j]]);
                               var dij = distanceMetric(a[0][j],a[1][map[i]]);
                               var dji = distanceMetric(a[0][i],a[1][map[j]]);
-							  if(dji + dij < KanjiCanvas.dii + djj) {
+							  if(dji + dij < Ocr.dii + djj) {
 							      var mapj = map[j];
 								  map[j] = map[i];
 								  map[i] = mapj;
-								  KanjiCanvas.dii = dij;
+								  Ocr.dii = dij;
 							  }
 						   } else {
 						       var dij = distanceMetric(a[0][j], a[1][map[i]]);
-                               if(dij < KanjiCanvas.dii) {
+                               if(dij < Ocr.dii) {
                                   map[j] = map[i];
                                   map[i] = -1;
-                                  KanjiCanvas.dii = dij;
+                                  Ocr.dii = dij;
 							    }
 						   }
 					   }
@@ -670,10 +670,10 @@ export function KanjiCanvasFactory(document) {
 	};
 	
 	// from optimal N-stroke map create M-N stroke map
-	KanjiCanvas.completeMap = function (pattern1, pattern2, distanceMetric, map) {
+	Ocr.completeMap = function (pattern1, pattern2, distanceMetric, map) {
        // [k1, k2, _, _]
        // a[0], a[1], a[2], a[3]
-		var a = KanjiCanvas.getLargerAndSize(pattern1, pattern2);
+		var a = Ocr.getLargerAndSize(pattern1, pattern2);
 	    if(!map.includes(-1)) {
 		    return map;
 		}
@@ -754,10 +754,10 @@ export function KanjiCanvasFactory(document) {
 	
 	// given two patterns, M-N stroke map and distanceMetric function,
 	// compute overall distance between two patterns
-	KanjiCanvas.computeDistance = function (pattern1, pattern2, distanceMetric, map) {
+	Ocr.computeDistance = function (pattern1, pattern2, distanceMetric, map) {
          // [k1, k2, n, m]
          // a[0], a[1], a[2], a[3]
-	     var a = KanjiCanvas.getLargerAndSize(pattern1, pattern2);
+	     var a = Ocr.getLargerAndSize(pattern1, pattern2);
 		 var dist = 0.0;
 		 var idx = 0;
 		 while(idx < a[2]) {
@@ -779,10 +779,10 @@ export function KanjiCanvasFactory(document) {
 	
 	// given two patterns, M-N strokemap, compute weighted (respect stroke
 	// length when there are concatenated strokes using the wholeWhole distance
-	KanjiCanvas.computeWholeDistanceWeighted = function (pattern1, pattern2, map) {
+	Ocr.computeWholeDistanceWeighted = function (pattern1, pattern2, map) {
          // [k1, k2, n, m]
          // a[0], a[1], a[2], a[3]
-	     var a = KanjiCanvas.getLargerAndSize(pattern1, pattern2);
+	     var a = Ocr.getLargerAndSize(pattern1, pattern2);
 		 var dist = 0.0;
 		 var idx = 0;
 		 while(idx < a[2]) {
@@ -797,7 +797,7 @@ export function KanjiCanvasFactory(document) {
 				stroke_concat = stroke_concat.concat(a[0][temp]);
 			 }
 			 
-			 var dist_idx = KanjiCanvas.wholeWholeDistance(stroke_idx, stroke_concat);
+			 var dist_idx = Ocr.wholeWholeDistance(stroke_idx, stroke_concat);
 			 if(stop > start + 1) {
 			    // concatenated stroke, adjust weight
 				var mm = typeof stroke_idx == 'undefined' ? 0 : stroke_idx.length;
@@ -817,16 +817,16 @@ export function KanjiCanvasFactory(document) {
 	
 	// apply coarse classficiation w.r.t. inputPattern
 	// considering _all_ referencePatterns using endpoint distance
-	KanjiCanvas.coarseClassification = function (inputPattern)  {
+	Ocr.coarseClassification = function (inputPattern)  {
 	   var inputLength = inputPattern.length;
 	   var candidates = [];
-	   for(var i=0;i<KanjiCanvas.refPatterns.length;i++) {
-	       var iLength = KanjiCanvas.refPatterns[i][1];
+	   for(var i=0;i<Ocr.refPatterns.length;i++) {
+	       var iLength = Ocr.refPatterns[i][1];
 		   if(inputLength < iLength + 2 && inputLength > iLength-3) {
-		       var iPattern = KanjiCanvas.refPatterns[i][2];
-			   var iMap = KanjiCanvas.getMap(iPattern, inputPattern, KanjiCanvas.endPointDistance);
-			   iMap =  KanjiCanvas.completeMap(iPattern, inputPattern, KanjiCanvas.endPointDistance, iMap);
-			   var dist = KanjiCanvas.computeDistance(iPattern, inputPattern, KanjiCanvas.endPointDistance, iMap);
+		       var iPattern = Ocr.refPatterns[i][2];
+			   var iMap = Ocr.getMap(iPattern, inputPattern, Ocr.endPointDistance);
+			   iMap =  Ocr.completeMap(iPattern, inputPattern, Ocr.endPointDistance, iMap);
+			   var dist = Ocr.computeDistance(iPattern, inputPattern, Ocr.endPointDistance, iMap);
 			   var m = iLength;
 			   var n = iPattern.length;
 			   if(n < m) {
@@ -844,7 +844,7 @@ export function KanjiCanvasFactory(document) {
 	       outStr += candidates[i][0];
 		   outStr += " ";
 		   outStr += candidates[i][1];
-		   outStr += KanjiCanvas.refPatterns[candidates[i][0]][0];
+		   outStr += Ocr.refPatterns[candidates[i][0]][0];
 		   outStr += "|";	   
 	   }	   
 	   document.getElementById("coarseCandidateList").innerHTML = outStr;
@@ -854,27 +854,27 @@ export function KanjiCanvasFactory(document) {
 	
 	// fine classfication. returns best 100 matches for inputPattern
 	// and candidate list (which should be provided by coarse classification
-	KanjiCanvas.fineClassification = function (inputPattern, inputCandidates) {
+	Ocr.fineClassification = function (inputPattern, inputCandidates) {
 	   var inputLength = inputPattern.length;
 	   var candidates = [];
 	   for(var i=0;i<Math.min(inputCandidates.length, 100);i++) {
 	       var j = inputCandidates[i][0];
-	       var iLength = KanjiCanvas.refPatterns[j][1];
-		   var iPattern = KanjiCanvas.refPatterns[j][2];
+	       var iLength = Ocr.refPatterns[j][1];
+		   var iPattern = Ocr.refPatterns[j][2];
 		      		   if(inputLength < iLength + 2 && inputLength > iLength-3) {
 
-		   var iMap = KanjiCanvas.getMap(iPattern, inputPattern, KanjiCanvas.initialDistance);
+		   var iMap = Ocr.getMap(iPattern, inputPattern, Ocr.initialDistance);
 
-		   iMap =  KanjiCanvas.completeMap(iPattern, inputPattern, KanjiCanvas.wholeWholeDistance, iMap);
-		   if(KanjiCanvas.refPatterns[j][0] == "委") {
+		   iMap =  Ocr.completeMap(iPattern, inputPattern, Ocr.wholeWholeDistance, iMap);
+		   if(Ocr.refPatterns[j][0] == "委") {
 		     console.log("finished imap, fine:");
 		     console.log(iMap);
 			 console.log("weight:")
-			 console.log(KanjiCanvas.computeDistance(iPattern, inputPattern, KanjiCanvas.wholeWholeDistance, iMap));
+			 console.log(Ocr.computeDistance(iPattern, inputPattern, Ocr.wholeWholeDistance, iMap));
 			 console.log("weight intended:")
-			 console.log(KanjiCanvas.computeDistance(iPattern, inputPattern, KanjiCanvas.wholeWholeDistance, [0,1,2,3,4,7,5,6]));
+			 console.log(Ocr.computeDistance(iPattern, inputPattern, Ocr.wholeWholeDistance, [0,1,2,3,4,7,5,6]));
 			 }
-		   var dist = KanjiCanvas.computeWholeDistanceWeighted(iPattern, inputPattern, iMap);
+		   var dist = Ocr.computeWholeDistanceWeighted(iPattern, inputPattern, iMap);
 		   var n = inputLength;
 		   var m = iPattern.length;
 		   if(m > n) {
@@ -890,7 +890,7 @@ export function KanjiCanvasFactory(document) {
 	       //outStr += candidates[i][0];
 		   //outStr += " ";
 		   //outStr += candidates[i][1];
-		   outStr += KanjiCanvas.refPatterns[candidates[i][0]][0];
+		   outStr += Ocr.refPatterns[candidates[i][0]][0];
 		   outStr += "  ";	   
 	   }	   
 	   //document.getElementById("candidateList").innerHTML = outStr;
@@ -899,7 +899,7 @@ export function KanjiCanvasFactory(document) {
 	};
   
 	/* test function for N-pair and M-N stroke map computation
-	 KanjiCanvas.testMap = function() {
+	 Ocr.testMap = function() {
 	  // var map = initStrokeMap(test_k21,test_k2,endPointDistance);
 	    // should give
         // 0  1  2 3 
@@ -932,36 +932,36 @@ export function KanjiCanvasFactory(document) {
 	}
 	*/
 	
-    KanjiCanvas.recognize = function (id) {
-      var mn = KanjiCanvas.momentNormalize(id);
+    Ocr.recognize = function (id) {
+      var mn = Ocr.momentNormalize(id);
 
-      var extractedFeatures = KanjiCanvas.extractFeatures(mn, 20.);
+      var extractedFeatures = Ocr.extractFeatures(mn, 20.);
 
-      var map = KanjiCanvas.getMap(extractedFeatures, KanjiCanvas.refPatterns[0][2] ,KanjiCanvas.endPointDistance);
-      map = KanjiCanvas.completeMap(extractedFeatures, KanjiCanvas.refPatterns[0][2],KanjiCanvas.endPointDistance, map);
+      var map = Ocr.getMap(extractedFeatures, Ocr.refPatterns[0][2] ,Ocr.endPointDistance);
+      map = Ocr.completeMap(extractedFeatures, Ocr.refPatterns[0][2],Ocr.endPointDistance, map);
 
-      var candidates = KanjiCanvas.coarseClassification(extractedFeatures);
+      var candidates = Ocr.coarseClassification(extractedFeatures);
 
-      KanjiCanvas.redraw(id);
+      Ocr.redraw(id);
 
       // display candidates in the specified element
-      if (KanjiCanvas["canvas_" + id].dataset.candidateList) {
-        document.getElementById(KanjiCanvas["canvas_" + id].dataset.candidateList).innerHTML = KanjiCanvas.fineClassification(extractedFeatures, candidates);
+      if (Ocr["canvas_" + id].dataset.candidateList) {
+        document.getElementById(Ocr["canvas_" + id].dataset.candidateList).innerHTML = Ocr.fineClassification(extractedFeatures, candidates);
       } 
 
       // otherwise log the result to the console if no candidateList is specified
       else {
-        return KanjiCanvas.fineClassification(extractedFeatures, candidates);
+        return Ocr.fineClassification(extractedFeatures, candidates);
       }
     };
 	
 	/* test moment normalization 
 	function MomentTest() {
-	  KanjiCanvas["recordedPattern_" + id] = test4;
-	  var mn = KanjiCanvas.momentNormalize(id);
-	  KanjiCanvas["recordedPattern_" + id] = mn;
+	  Ocr["recordedPattern_" + id] = test4;
+	  var mn = Ocr.momentNormalize(id);
+	  Ocr["recordedPattern_" + id] = mn;
 	  console.log(mn);
-	  KanjiCanvas.redraw(id);
+	  Ocr.redraw(id);
 	
 	} */
 	
@@ -969,20 +969,20 @@ export function KanjiCanvasFactory(document) {
 	   as array to clipboard
 	   i.e. to add missing patterns
 	*/
-	KanjiCanvas.copyStuff = function (id) {
-	  KanjiCanvas.s = "";
+	Ocr.copyStuff = function (id) {
+	  Ocr.s = "";
       
-	  for (var i = 0, j = KanjiCanvas["recordedPattern_" + id].length; i < j; i++) {
-	    console.log(i + 1, KanjiCanvas["recordedPattern_" + id][i], KanjiCanvas["recordedPattern_" + id][i].toString());
-	    console.log(KanjiCanvas["recordedPattern_" + id][i]);
-	    console.log(JSON.stringify(KanjiCanvas["recordedPattern_" + id][i]));
-	    KanjiCanvas.s += "[" + JSON.stringify(KanjiCanvas["recordedPattern_" + id][i]) + "],";
+	  for (var i = 0, j = Ocr["recordedPattern_" + id].length; i < j; i++) {
+	    console.log(i + 1, Ocr["recordedPattern_" + id][i], Ocr["recordedPattern_" + id][i].toString());
+	    console.log(Ocr["recordedPattern_" + id][i]);
+	    console.log(JSON.stringify(Ocr["recordedPattern_" + id][i]));
+	    Ocr.s += "[" + JSON.stringify(Ocr["recordedPattern_" + id][i]) + "],";
 	  }
       
-	  KanjiCanvas.copyToClipboard(KanjiCanvas.s);
+	  Ocr.copyToClipboard(Ocr.s);
 	};
   
-	KanjiCanvas.copyToClipboard = function (str) {
+	Ocr.copyToClipboard = function (str) {
 		var el = document.createElement('textarea');
 		el.value = str;
 		document.body.appendChild(el);
@@ -996,24 +996,24 @@ export function KanjiCanvasFactory(document) {
   document.addEventListener('keydown', function (e) {
     var id = document.activeElement.id;
     
-    if (KanjiCanvas["canvas_" + id] && e.ctrlKey) {
+    if (Ocr["canvas_" + id] && e.ctrlKey) {
       switch (e.key.toLowerCase()) {
         // undo
         case 'z' :
           e.preventDefault();
-          KanjiCanvas.deleteLast(id);
+          Ocr.deleteLast(id);
           break;
 
         // erase
         case 'x' :
           e.preventDefault();
-          KanjiCanvas.erase(id);
+          Ocr.erase(id);
           break;
         
         // recognize
         case 'f' :
           e.preventDefault();
-          KanjiCanvas.recognize(id);
+          Ocr.recognize(id);
           break;
 
         default :
@@ -1022,5 +1022,5 @@ export function KanjiCanvasFactory(document) {
     }
 	});
 
-  return KanjiCanvas;
+  return Ocr;
 }
