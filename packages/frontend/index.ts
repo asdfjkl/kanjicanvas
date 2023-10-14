@@ -1,4 +1,4 @@
-import type { Position, Stroke, TegakiStroke } from "../types/index";
+import type { Position, Stroke, TegakiStroke } from "@tegaki/types/index";
 import { CandidateContainerNotFoundError, CanvasCtxNotFoundError, InitializeError } from "./errors";
 
 // TODO: private properties
@@ -34,7 +34,7 @@ export interface Tegaki {
   s: string;
   dii: number;
 
-  init: (id: string) => void | InitializeError;
+  init: (id: string, refPatterns: Array<TegakiStroke>) => void | InitializeError;
   draw: (color?: string) => void | CanvasCtxNotFoundError;
   deleteLast: () => void | CanvasCtxNotFoundError;
   erase: () => void | CanvasCtxNotFoundError;
@@ -144,7 +144,7 @@ export function createTegaki(document: Document): Tegaki {
   let canvasId: string = null!;
 
   // init canvas
-  Tegaki.init = function (id) {
+  Tegaki.init = function (id, refPatterns) {
     canvasId = id;
     const c = document.getElementById(canvasId);
     if (!c) {
@@ -227,6 +227,8 @@ export function createTegaki(document: Document): Tegaki {
       },
       false,
     );
+
+    Tegaki.refPatterns = refPatterns;
   };
 
   Tegaki.draw = function (color) {
