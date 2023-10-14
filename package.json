@@ -12,7 +12,8 @@
     }
   },
   "scripts": {
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build": "node scripts/build.js"
   },
   "devDependencies": {
     "esbuild": "^0.19.4",
