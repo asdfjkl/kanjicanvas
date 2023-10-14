@@ -244,7 +244,11 @@ export function createTegaki(document) {
 
         // outline
         Tegaki["ctx_" + id].lineWidth = 3;
-        Tegaki["ctx_" + id].strokeStyle = Tegaki.alterHex(Tegaki.strokeColors[i] ? Tegaki.strokeColors[i] : "#333333", 60, "dec");
+        Tegaki["ctx_" + id].strokeStyle = Tegaki.alterHex(
+          Tegaki.strokeColors[i] ? Tegaki.strokeColors[i] : "#333333",
+          60,
+          "dec",
+        );
         Tegaki["ctx_" + id].strokeText((i + 1).toString(), x, y);
 
         // fill
@@ -934,7 +938,9 @@ export function createTegaki(document) {
           console.log("weight:");
           console.log(Tegaki.computeDistance(iPattern, inputPattern, Tegaki.wholeWholeDistance, iMap));
           console.log("weight intended:");
-          console.log(Tegaki.computeDistance(iPattern, inputPattern, Tegaki.wholeWholeDistance, [0, 1, 2, 3, 4, 7, 5, 6]));
+          console.log(
+            Tegaki.computeDistance(iPattern, inputPattern, Tegaki.wholeWholeDistance, [0, 1, 2, 3, 4, 7, 5, 6]),
+          );
         }
         var dist = Tegaki.computeWholeDistanceWeighted(iPattern, inputPattern, iMap);
         var n = inputLength;

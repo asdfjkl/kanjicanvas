@@ -23,6 +23,9 @@ devDependencies:
   prettier:
     specifier: ^3.0.3
     version: 3.0.3
+  typescript:
+    specifier: ^5.2.2
+    version: 5.2.2
 
 packages:
   /@aashutoshrathi/word-wrap@1.2.6:
@@ -1961,6 +1964,13 @@ packages:
       { integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q== }
     dependencies:
       is-typedarray: 1.0.0
+    dev: true
+
+  /typescript@5.2.2:
+    resolution:
+      { integrity: sha512-mI4WrpHsbCIcwT9cF4FZvr80QUeKvsUsUvKDoR+X/7XHQH98xYD8YHZg7ANtz2GtZt/CBq2QJ0thkGJMHfqc1w== }
+    engines: { node: ">=14.17" }
+    hasBin: true
     dev: true
 
   /unique-string@3.0.0:

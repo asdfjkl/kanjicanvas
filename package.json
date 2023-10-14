@@ -13,7 +13,9 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "build": "node scripts/build.js",
+    "build": "pnpm run bundle && pnpm run build:types",
+    "bundle": "node scripts/build.js",
+    "build:types": "tsc --project tsconfig.json",
     "fmt": "prettier",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "spell-check": "cspell lint \"**\" --no-progress --show-suggestions --show-context --cache"
@@ -24,7 +26,8 @@
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.0.0",
     "husky": "^8.0.3",
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
   },
   "volta": {
     "node": "18.18.2"
