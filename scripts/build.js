@@ -6,9 +6,10 @@ import path from "path";
  */
 await esbuild.build({
   entryPoints: [
-    path.resolve("packages/frontend/index.js"),
-    // path.resolve("packages/backend/index.js"), // coming soon
-    path.resolve("packages/dataset/index.js"),
+    path.resolve("packages/frontend/index"),
+    path.resolve("packages/backend/index"),
+    path.resolve("packages/dataset/index"),
+    path.resolve("packages/tegaki/index"),
   ],
   bundle: true,
   outdir: "dist",
