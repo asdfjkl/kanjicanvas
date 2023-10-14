@@ -15,9 +15,11 @@
     "prepare": "husky install",
     "build": "node scripts/build.js",
     "fmt": "prettier --write",
-    "lint": "ESLINT_USE_FLAT_CONFIG=true eslint"
+    "lint": "ESLINT_USE_FLAT_CONFIG=true eslint",
+    "spell-check": "cspell lint \"**\" --no-progress --show-suggestions --show-context --cache"
   },
   "devDependencies": {
+    "cspell": "^7.3.8",
     "esbuild": "^0.19.4",
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.0.0",

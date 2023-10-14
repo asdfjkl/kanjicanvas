@@ -64,35 +64,35 @@ export function OcrFactory(document) {
     Ocr["canvas_" + id].addEventListener(
       "mousemove",
       function (e) {
-        Ocr.findxy("move", e, id);
+        Ocr.find_x_y("move", e, id);
       },
       false,
     );
     Ocr["canvas_" + id].addEventListener(
       "mousedown",
       function (e) {
-        Ocr.findxy("down", e, id);
+        Ocr.find_x_y("down", e, id);
       },
       false,
     );
     Ocr["canvas_" + id].addEventListener(
       "mouseup",
       function (e) {
-        Ocr.findxy("up", e, id);
+        Ocr.find_x_y("up", e, id);
       },
       false,
     );
     Ocr["canvas_" + id].addEventListener(
       "mouseout",
       function (e) {
-        Ocr.findxy("out", e, id);
+        Ocr.find_x_y("out", e, id);
       },
       false,
     );
     Ocr["canvas_" + id].addEventListener(
       "mouseover",
       function (e) {
-        Ocr.findxy("over", e, id);
+        Ocr.find_x_y("over", e, id);
       },
       false,
     );
@@ -101,21 +101,21 @@ export function OcrFactory(document) {
     Ocr["canvas_" + id].addEventListener(
       "touchmove",
       function (e) {
-        Ocr.findxy("move", e, id);
+        Ocr.find_x_y("move", e, id);
       },
       false,
     );
     Ocr["canvas_" + id].addEventListener(
       "touchstart",
       function (e) {
-        Ocr.findxy("down", e, id);
+        Ocr.find_x_y("down", e, id);
       },
       false,
     );
     Ocr["canvas_" + id].addEventListener(
       "touchend",
       function (e) {
-        Ocr.findxy("up", e, id);
+        Ocr.find_x_y("up", e, id);
       },
       false,
     );
@@ -155,7 +155,7 @@ export function OcrFactory(document) {
     Ocr["recordedPattern_" + id].length = 0;
   };
 
-  Ocr.findxy = function (res, e, id) {
+  Ocr.find_x_y = function (res, e, id) {
     var touch = e.changedTouches ? e.changedTouches[0] : null;
 
     if (touch) e.preventDefault(); // prevent scrolling while drawing to the canvas
@@ -406,7 +406,7 @@ export function OcrFactory(document) {
     return r2;
   };
 
-  Ocr.chopOverbounds = function (pattern) {
+  Ocr.chopOverBounds = function (pattern) {
     var chopped = new Array();
     for (var i = 0; i < pattern.length; i++) {
       var stroke_i = pattern[i];
@@ -608,15 +608,15 @@ export function OcrFactory(document) {
   Ocr.initialDistance = function (pattern1, pattern2) {
     var l1 = pattern1.length;
     var l2 = pattern2.length;
-    var lmin = Math.min(l1, l2);
-    var lmax = Math.max(l1, l2);
+    var l_min = Math.min(l1, l2);
+    var l_max = Math.max(l1, l2);
     var dist = 0;
-    for (var i = 0; i < lmin; i++) {
+    for (var i = 0; i < l_min; i++) {
       var x1y1 = pattern1[i];
       var x2y2 = pattern2[i];
       dist += Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]);
     }
-    return dist * (lmax / lmin);
+    return dist * (l_max / l_min);
   };
 
   // given to pattern, determine longer (more strokes)
@@ -709,9 +709,9 @@ export function OcrFactory(document) {
                 var dij = distanceMetric(a[0][j], a[1][map[i]]);
                 var dji = distanceMetric(a[0][i], a[1][map[j]]);
                 if (dji + dij < Ocr.dii + djj) {
-                  var mapj = map[j];
+                  var map_j = map[j];
                   map[j] = map[i];
-                  map[i] = mapj;
+                  map[i] = map_j;
                   Ocr.dii = dij;
                 }
               } else {
@@ -838,7 +838,7 @@ export function OcrFactory(document) {
     return dist;
   };
 
-  // given two patterns, M-N strokemap, compute weighted (respect stroke
+  // given two patterns, M-N stroke_map, compute weighted (respect stroke
   // length when there are concatenated strokes using the wholeWhole distance
   Ocr.computeWholeDistanceWeighted = function (pattern1, pattern2, map) {
     // [k1, k2, n, m]
@@ -876,7 +876,7 @@ export function OcrFactory(document) {
     return dist;
   };
 
-  // apply coarse classficiation w.r.t. inputPattern
+  // apply coarse classfication w.r.t. inputPattern
   // considering _all_ referencePatterns using endpoint distance
   Ocr.coarseClassification = function (inputPattern) {
     var inputLength = inputPattern.length;

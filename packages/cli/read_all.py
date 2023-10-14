@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET  
+import xml.etree.ElementTree as ET
 import os
 import math
 import ast
@@ -112,7 +112,7 @@ def aran(width, height):
     r2 = math.sqrt(math.sin((math.pi / 2.) * r1))
     return r2
 
-def chopOverbounds(pattern):
+def chopOverBounds(pattern):
     chopped = []
     for i in range(0, len(pattern)):
         stroke_i = pattern[i]
@@ -192,7 +192,7 @@ def momentNormalize(input_data):
             newY = (alpha * (si[j][1] - yc_)) + yc_half
             nsi.append([newX, newY])
         normalizedPattern.append(nsi)
-        
+
     return transform(normalizedPattern, xOffset, yOffset)
 
 def euclid(x1y1, x2y2):
@@ -239,7 +239,7 @@ def extractFeatures(input_data, interval):
 #mn = momentNormalize(test4)
 #print(mn)
 
-input_datas = []
+input_data_list = []
 
 filenames = (os.listdir("/home/user/code/convert/xmls"))
 for filename in filenames:
@@ -271,17 +271,17 @@ for filename in filenames:
                 char = ast.literal_eval("u'{}'".format(s))
                 #print(char)
             stroke = []
-            for subelem in elem:
-                x = int(subelem.attrib["x"])
-                y = int(subelem.attrib["y"])
+            for sub_elem in elem:
+                x = int(sub_elem.attrib["x"])
+                y = int(sub_elem.attrib["y"])
                 stroke.append([x,y])
             if(len(stroke) > 0):
                 strokes.append(stroke)
         #print(char)
-        input_datas.append([char, len(strokes), strokes])
+        input_data_list.append([char, len(strokes), strokes])
 
 
-for (utf, l, pattern) in input_datas:
+for (utf, l, pattern) in input_data_list:
     #print(pattern)
     norm_i = momentNormalize(pattern)
     ex_i = extractFeatures(norm_i, 20.)
@@ -291,7 +291,7 @@ for (utf, l, pattern) in input_datas:
     #print(
     #print(ast.literal_eval("u'{}'".format(utf)))
     #print(str([ utf, l, ex_i])+", ")
-#print(input_datas)
+#print(input_data_list)
 
 
 
@@ -307,8 +307,8 @@ print('\nAll attributes:')
 for elem in root:
     print(elem.text.encode("utf-8"))
     print("elem")
-    for subelem in elem:
-        #print(subelem)
-        print(subelem.attrib["x"])
+    for sub_elem in elem:
+        #print(sub_elem)
+        print(sub_elem.attrib["x"])
 """
 
