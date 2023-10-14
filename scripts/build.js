@@ -6,8 +6,9 @@ import path from "path";
  */
 await esbuild.build({
   entryPoints: [
-    path.resolve("packages/core/kanji-canvas.js"),
-    path.resolve("packages/dataset/ref-patterns.js"),
+    path.resolve("packages/frontend/index.js"),
+    // path.resolve("packages/backend/index.js"), // coming soon
+    path.resolve("packages/dataset/index.js"),
   ],
   bundle: true,
   outdir: "dist",
