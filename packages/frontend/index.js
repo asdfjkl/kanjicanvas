@@ -1,17 +1,17 @@
-export function OcrFactory(document) {
+export function createTegaki(document) {
   "use strict";
 
-  // call Ocr.init(id) to initialize a canvas as a Ocr
+  // call Tegaki.init(id) to initialize a canvas as a Tegaki
   // `id` must be the id attribute of the canvas.
-  // ex: Ocr.init('canvas-1');
-  const Ocr = new Object();
+  // ex: Tegaki.init('canvas-1');
+  const Tegaki = new Object();
 
-  // patterns loaded externally from ref-patterns.js (always run after Ocr is defined)
-  Ocr.refPatterns = [];
+  // patterns loaded externally from ref-patterns.js (always run after Tegaki is defined)
+  Tegaki.refPatterns = [];
 
   // color coded stroke colors (for 30 strokes)
   // based on https://kanjivg.tagaini.net/viewer.html
-  Ocr.strokeColors = [
+  Tegaki.strokeColors = [
     "#bf0000",
     "#bf5600",
     "#bfac00",
@@ -45,153 +45,153 @@ export function OcrFactory(document) {
   ];
 
   // init canvas
-  Ocr.init = function (id) {
-    Ocr["canvas_" + id] = document.getElementById(id);
-    Ocr["canvas_" + id].tabIndex = 0; // makes canvas focusable, allowing usage of shortcuts
-    Ocr["ctx_" + id] = Ocr["canvas_" + id].getContext("2d");
-    Ocr["w_" + id] = Ocr["canvas_" + id].width;
-    Ocr["h_" + id] = Ocr["canvas_" + id].height;
-    Ocr["flagOver_" + id] = false;
-    Ocr["flagDown_" + id] = false;
-    Ocr["prevX_" + id] = 0;
-    Ocr["currX_" + id] = 0;
-    Ocr["prevY_" + id] = 0;
-    Ocr["currY_" + id] = 0;
-    Ocr["dot_flag_" + id] = false;
-    Ocr["recordedPattern_" + id] = new Array();
-    Ocr["currentLine_" + id] = null;
+  Tegaki.init = function (id) {
+    Tegaki["canvas_" + id] = document.getElementById(id);
+    Tegaki["canvas_" + id].tabIndex = 0; // makes canvas focusable, allowing usage of shortcuts
+    Tegaki["ctx_" + id] = Tegaki["canvas_" + id].getContext("2d");
+    Tegaki["w_" + id] = Tegaki["canvas_" + id].width;
+    Tegaki["h_" + id] = Tegaki["canvas_" + id].height;
+    Tegaki["flagOver_" + id] = false;
+    Tegaki["flagDown_" + id] = false;
+    Tegaki["prevX_" + id] = 0;
+    Tegaki["currX_" + id] = 0;
+    Tegaki["prevY_" + id] = 0;
+    Tegaki["currY_" + id] = 0;
+    Tegaki["dot_flag_" + id] = false;
+    Tegaki["recordedPattern_" + id] = new Array();
+    Tegaki["currentLine_" + id] = null;
 
-    Ocr["canvas_" + id].addEventListener(
+    Tegaki["canvas_" + id].addEventListener(
       "mousemove",
       function (e) {
-        Ocr.find_x_y("move", e, id);
+        Tegaki.find_x_y("move", e, id);
       },
       false,
     );
-    Ocr["canvas_" + id].addEventListener(
+    Tegaki["canvas_" + id].addEventListener(
       "mousedown",
       function (e) {
-        Ocr.find_x_y("down", e, id);
+        Tegaki.find_x_y("down", e, id);
       },
       false,
     );
-    Ocr["canvas_" + id].addEventListener(
+    Tegaki["canvas_" + id].addEventListener(
       "mouseup",
       function (e) {
-        Ocr.find_x_y("up", e, id);
+        Tegaki.find_x_y("up", e, id);
       },
       false,
     );
-    Ocr["canvas_" + id].addEventListener(
+    Tegaki["canvas_" + id].addEventListener(
       "mouseout",
       function (e) {
-        Ocr.find_x_y("out", e, id);
+        Tegaki.find_x_y("out", e, id);
       },
       false,
     );
-    Ocr["canvas_" + id].addEventListener(
+    Tegaki["canvas_" + id].addEventListener(
       "mouseover",
       function (e) {
-        Ocr.find_x_y("over", e, id);
+        Tegaki.find_x_y("over", e, id);
       },
       false,
     );
 
     // touch events
-    Ocr["canvas_" + id].addEventListener(
+    Tegaki["canvas_" + id].addEventListener(
       "touchmove",
       function (e) {
-        Ocr.find_x_y("move", e, id);
+        Tegaki.find_x_y("move", e, id);
       },
       false,
     );
-    Ocr["canvas_" + id].addEventListener(
+    Tegaki["canvas_" + id].addEventListener(
       "touchstart",
       function (e) {
-        Ocr.find_x_y("down", e, id);
+        Tegaki.find_x_y("down", e, id);
       },
       false,
     );
-    Ocr["canvas_" + id].addEventListener(
+    Tegaki["canvas_" + id].addEventListener(
       "touchend",
       function (e) {
-        Ocr.find_x_y("up", e, id);
+        Tegaki.find_x_y("up", e, id);
       },
       false,
     );
   };
 
-  Ocr.draw = function (id, color) {
-    Ocr["ctx_" + id].beginPath();
-    Ocr["ctx_" + id].moveTo(Ocr["prevX_" + id], Ocr["prevY_" + id]);
-    Ocr["ctx_" + id].lineTo(Ocr["currX_" + id], Ocr["currY_" + id]);
-    Ocr["ctx_" + id].strokeStyle = color ? color : "#333";
-    Ocr["ctx_" + id].lineCap = "round";
-    //Ocr["ctx_" + id].lineJoin = "round";
-    //Ocr["ctx_" + id].lineMiter = "round";
-    Ocr["ctx_" + id].lineWidth = 4;
-    Ocr["ctx_" + id].stroke();
-    Ocr["ctx_" + id].closePath();
+  Tegaki.draw = function (id, color) {
+    Tegaki["ctx_" + id].beginPath();
+    Tegaki["ctx_" + id].moveTo(Tegaki["prevX_" + id], Tegaki["prevY_" + id]);
+    Tegaki["ctx_" + id].lineTo(Tegaki["currX_" + id], Tegaki["currY_" + id]);
+    Tegaki["ctx_" + id].strokeStyle = color ? color : "#333";
+    Tegaki["ctx_" + id].lineCap = "round";
+    //Tegaki["ctx_" + id].lineJoin = "round";
+    //Tegaki["ctx_" + id].lineMiter = "round";
+    Tegaki["ctx_" + id].lineWidth = 4;
+    Tegaki["ctx_" + id].stroke();
+    Tegaki["ctx_" + id].closePath();
   };
 
-  Ocr.deleteLast = function (id) {
-    Ocr["ctx_" + id].clearRect(0, 0, Ocr["w_" + id], Ocr["h_" + id]);
-    for (var i = 0; i < Ocr["recordedPattern_" + id].length - 1; i++) {
-      var stroke_i = Ocr["recordedPattern_" + id][i];
+  Tegaki.deleteLast = function (id) {
+    Tegaki["ctx_" + id].clearRect(0, 0, Tegaki["w_" + id], Tegaki["h_" + id]);
+    for (var i = 0; i < Tegaki["recordedPattern_" + id].length - 1; i++) {
+      var stroke_i = Tegaki["recordedPattern_" + id][i];
       for (var j = 0; j < stroke_i.length - 1; j++) {
-        Ocr["prevX_" + id] = stroke_i[j][0];
-        Ocr["prevY_" + id] = stroke_i[j][1];
+        Tegaki["prevX_" + id] = stroke_i[j][0];
+        Tegaki["prevY_" + id] = stroke_i[j][1];
 
-        Ocr["currX_" + id] = stroke_i[j + 1][0];
-        Ocr["currY_" + id] = stroke_i[j + 1][1];
-        Ocr.draw(id);
+        Tegaki["currX_" + id] = stroke_i[j + 1][0];
+        Tegaki["currY_" + id] = stroke_i[j + 1][1];
+        Tegaki.draw(id);
       }
     }
-    Ocr["recordedPattern_" + id].pop();
+    Tegaki["recordedPattern_" + id].pop();
   };
 
-  Ocr.erase = function (id) {
-    Ocr["ctx_" + id].clearRect(0, 0, Ocr["w_" + id], Ocr["h_" + id]);
-    Ocr["recordedPattern_" + id].length = 0;
+  Tegaki.erase = function (id) {
+    Tegaki["ctx_" + id].clearRect(0, 0, Tegaki["w_" + id], Tegaki["h_" + id]);
+    Tegaki["recordedPattern_" + id].length = 0;
   };
 
-  Ocr.find_x_y = function (res, e, id) {
+  Tegaki.find_x_y = function (res, e, id) {
     var touch = e.changedTouches ? e.changedTouches[0] : null;
 
     if (touch) e.preventDefault(); // prevent scrolling while drawing to the canvas
 
     if (res == "down") {
-      var rect = Ocr["canvas_" + id].getBoundingClientRect();
-      Ocr["prevX_" + id] = Ocr["currX_" + id];
-      Ocr["prevY_" + id] = Ocr["currY_" + id];
-      Ocr["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
-      Ocr["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
-      Ocr["currentLine_" + id] = new Array();
-      Ocr["currentLine_" + id].push([Ocr["currX_" + id], Ocr["currY_" + id]]);
+      var rect = Tegaki["canvas_" + id].getBoundingClientRect();
+      Tegaki["prevX_" + id] = Tegaki["currX_" + id];
+      Tegaki["prevY_" + id] = Tegaki["currY_" + id];
+      Tegaki["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
+      Tegaki["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
+      Tegaki["currentLine_" + id] = new Array();
+      Tegaki["currentLine_" + id].push([Tegaki["currX_" + id], Tegaki["currY_" + id]]);
 
-      Ocr["flagDown_" + id] = true;
-      Ocr["flagOver_" + id] = true;
-      Ocr["dot_flag_" + id] = true;
-      if (Ocr["dot_flag_" + id]) {
-        Ocr["ctx_" + id].beginPath();
-        Ocr["ctx_" + id].fillRect(Ocr["currX_" + id], Ocr["currY_" + id], 2, 2);
-        Ocr["ctx_" + id].closePath();
-        Ocr["dot_flag_" + id] = false;
+      Tegaki["flagDown_" + id] = true;
+      Tegaki["flagOver_" + id] = true;
+      Tegaki["dot_flag_" + id] = true;
+      if (Tegaki["dot_flag_" + id]) {
+        Tegaki["ctx_" + id].beginPath();
+        Tegaki["ctx_" + id].fillRect(Tegaki["currX_" + id], Tegaki["currY_" + id], 2, 2);
+        Tegaki["ctx_" + id].closePath();
+        Tegaki["dot_flag_" + id] = false;
       }
     }
     if (res == "up") {
-      Ocr["flagDown_" + id] = false;
-      if (Ocr["flagOver_" + id] == true) {
-        Ocr["recordedPattern_" + id].push(Ocr["currentLine_" + id]);
+      Tegaki["flagDown_" + id] = false;
+      if (Tegaki["flagOver_" + id] == true) {
+        Tegaki["recordedPattern_" + id].push(Tegaki["currentLine_" + id]);
       }
     }
 
     if (res == "out") {
-      Ocr["flagOver_" + id] = false;
-      if (Ocr["flagDown_" + id] == true) {
-        Ocr["recordedPattern_" + id].push(Ocr["currentLine_" + id]);
+      Tegaki["flagOver_" + id] = false;
+      if (Tegaki["flagDown_" + id] == true) {
+        Tegaki["recordedPattern_" + id].push(Tegaki["currentLine_" + id]);
       }
-      Ocr["flagDown_" + id] = false;
+      Tegaki["flagDown_" + id] = false;
     }
 
     /*
@@ -200,63 +200,63 @@ export function OcrFactory(document) {
 	*/
 
     if (res == "move") {
-      if (Ocr["flagOver_" + id] && Ocr["flagDown_" + id]) {
-        var rect = Ocr["canvas_" + id].getBoundingClientRect();
-        Ocr["prevX_" + id] = Ocr["currX_" + id];
-        Ocr["prevY_" + id] = Ocr["currY_" + id];
-        Ocr["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
-        Ocr["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
-        Ocr["currentLine_" + id].push([Ocr["prevX_" + id], Ocr["prevY_" + id]]);
-        Ocr["currentLine_" + id].push([Ocr["currX_" + id], Ocr["currY_" + id]]);
-        Ocr.draw(id);
+      if (Tegaki["flagOver_" + id] && Tegaki["flagDown_" + id]) {
+        var rect = Tegaki["canvas_" + id].getBoundingClientRect();
+        Tegaki["prevX_" + id] = Tegaki["currX_" + id];
+        Tegaki["prevY_" + id] = Tegaki["currY_" + id];
+        Tegaki["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
+        Tegaki["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
+        Tegaki["currentLine_" + id].push([Tegaki["prevX_" + id], Tegaki["prevY_" + id]]);
+        Tegaki["currentLine_" + id].push([Tegaki["currX_" + id], Tegaki["currY_" + id]]);
+        Tegaki.draw(id);
       }
     }
   };
 
   // redraw to current canvas according to
-  // what is currently stored in Ocr["recordedPattern_" + id]
+  // what is currently stored in Tegaki["recordedPattern_" + id]
   // add numbers to each stroke
-  Ocr.redraw = function (id) {
-    Ocr["ctx_" + id].clearRect(0, 0, Ocr["w_" + id], Ocr["h_" + id]);
+  Tegaki.redraw = function (id) {
+    Tegaki["ctx_" + id].clearRect(0, 0, Tegaki["w_" + id], Tegaki["h_" + id]);
 
     // draw strokes
-    for (var i = 0; i < Ocr["recordedPattern_" + id].length; i++) {
-      var stroke_i = Ocr["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
+      var stroke_i = Tegaki["recordedPattern_" + id][i];
 
       for (var j = 0; j < stroke_i.length - 1; j++) {
-        Ocr["prevX_" + id] = stroke_i[j][0];
-        Ocr["prevY_" + id] = stroke_i[j][1];
+        Tegaki["prevX_" + id] = stroke_i[j][0];
+        Tegaki["prevY_" + id] = stroke_i[j][1];
 
-        Ocr["currX_" + id] = stroke_i[j + 1][0];
-        Ocr["currY_" + id] = stroke_i[j + 1][1];
-        Ocr.draw(id, Ocr.strokeColors[i]);
+        Tegaki["currX_" + id] = stroke_i[j + 1][0];
+        Tegaki["currY_" + id] = stroke_i[j + 1][1];
+        Tegaki.draw(id, Tegaki.strokeColors[i]);
       }
     }
 
     // draw stroke numbers
-    if (Ocr["canvas_" + id].dataset.strokeNumbers != "false") {
-      for (var i = 0; i < Ocr["recordedPattern_" + id].length; i++) {
-        var stroke_i = Ocr["recordedPattern_" + id][i],
+    if (Tegaki["canvas_" + id].dataset.strokeNumbers != "false") {
+      for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
+        var stroke_i = Tegaki["recordedPattern_" + id][i],
           x = stroke_i[Math.floor(stroke_i.length / 2)][0] + 5,
           y = stroke_i[Math.floor(stroke_i.length / 2)][1] - 5;
 
-        Ocr["ctx_" + id].font = "20px Arial";
+        Tegaki["ctx_" + id].font = "20px Arial";
 
         // outline
-        Ocr["ctx_" + id].lineWidth = 3;
-        Ocr["ctx_" + id].strokeStyle = Ocr.alterHex(Ocr.strokeColors[i] ? Ocr.strokeColors[i] : "#333333", 60, "dec");
-        Ocr["ctx_" + id].strokeText((i + 1).toString(), x, y);
+        Tegaki["ctx_" + id].lineWidth = 3;
+        Tegaki["ctx_" + id].strokeStyle = Tegaki.alterHex(Tegaki.strokeColors[i] ? Tegaki.strokeColors[i] : "#333333", 60, "dec");
+        Tegaki["ctx_" + id].strokeText((i + 1).toString(), x, y);
 
         // fill
-        Ocr["ctx_" + id].fillStyle = Ocr.strokeColors[i] ? Ocr.strokeColors[i] : "#333";
-        Ocr["ctx_" + id].fillText((i + 1).toString(), x, y);
+        Tegaki["ctx_" + id].fillStyle = Tegaki.strokeColors[i] ? Tegaki.strokeColors[i] : "#333";
+        Tegaki["ctx_" + id].fillText((i + 1).toString(), x, y);
       }
     }
   };
 
   // modifies hex colors to darken or lighten them
-  // ex: Ocr.alterHex(Ocr.strokeColors[0], 60, 'dec'); // decrement all colors by 60 (use 'inc' to increment)
-  Ocr.alterHex = function (hex, number, action) {
+  // ex: Tegaki.alterHex(Tegaki.strokeColors[0], 60, 'dec'); // decrement all colors by 60 (use 'inc' to increment)
+  Tegaki.alterHex = function (hex, number, action) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex),
       color = [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)],
       i = 0,
@@ -283,57 +283,57 @@ export function OcrFactory(document) {
     return "#" + color.join("");
   };
 
-  // linear normalization for Ocr["recordedPattern_" + id]
-  Ocr.normalizeLinear = function (id) {
+  // linear normalization for Tegaki["recordedPattern_" + id]
+  Tegaki.normalizeLinear = function (id) {
     var normalizedPattern = new Array();
-    Ocr.newHeight = 256;
-    Ocr.newWidth = 256;
-    Ocr.xMin = 256;
-    Ocr.xMax = 0;
-    Ocr.yMin = 256;
-    Ocr.yMax = 0;
+    Tegaki.newHeight = 256;
+    Tegaki.newWidth = 256;
+    Tegaki.xMin = 256;
+    Tegaki.xMax = 0;
+    Tegaki.yMin = 256;
+    Tegaki.yMax = 0;
     // first determine drawn character width / length
-    for (var i = 0; i < Ocr["recordedPattern_" + id].length; i++) {
-      var stroke_i = Ocr["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
+      var stroke_i = Tegaki["recordedPattern_" + id][i];
       for (var j = 0; j < stroke_i.length; j++) {
-        Ocr.x = stroke_i[j][0];
-        Ocr.y = stroke_i[j][1];
-        if (Ocr.x < Ocr.xMin) {
-          Ocr.xMin = Ocr.x;
+        Tegaki.x = stroke_i[j][0];
+        Tegaki.y = stroke_i[j][1];
+        if (Tegaki.x < Tegaki.xMin) {
+          Tegaki.xMin = Tegaki.x;
         }
-        if (Ocr.x > Ocr.xMax) {
-          Ocr.xMax = Ocr.x;
+        if (Tegaki.x > Tegaki.xMax) {
+          Tegaki.xMax = Tegaki.x;
         }
-        if (Ocr.y < Ocr.yMin) {
-          Ocr.yMin = Ocr.y;
+        if (Tegaki.y < Tegaki.yMin) {
+          Tegaki.yMin = Tegaki.y;
         }
-        if (Ocr.y > Ocr.yMax) {
-          Ocr.yMax = Ocr.y;
+        if (Tegaki.y > Tegaki.yMax) {
+          Tegaki.yMax = Tegaki.y;
         }
       }
     }
-    Ocr.oldHeight = Math.abs(Ocr.yMax - Ocr.yMin);
-    Ocr.oldWidth = Math.abs(Ocr.xMax - Ocr.xMin);
+    Tegaki.oldHeight = Math.abs(Tegaki.yMax - Tegaki.yMin);
+    Tegaki.oldWidth = Math.abs(Tegaki.xMax - Tegaki.xMin);
 
-    for (var i = 0; i < Ocr["recordedPattern_" + id].length; i++) {
-      var stroke_i = Ocr["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
+      var stroke_i = Tegaki["recordedPattern_" + id][i];
       var normalized_stroke_i = new Array();
       for (var j = 0; j < stroke_i.length; j++) {
-        Ocr.x = stroke_i[j][0];
-        Ocr.y = stroke_i[j][1];
-        Ocr.xNorm = (Ocr.x - Ocr.xMin) * (Ocr.newWidth / Ocr.oldWidth);
-        Ocr.yNorm = (Ocr.y - Ocr.yMin) * (Ocr.newHeight / Ocr.oldHeight);
-        normalized_stroke_i.push([Ocr.xNorm, Ocr.yNorm]);
+        Tegaki.x = stroke_i[j][0];
+        Tegaki.y = stroke_i[j][1];
+        Tegaki.xNorm = (Tegaki.x - Tegaki.xMin) * (Tegaki.newWidth / Tegaki.oldWidth);
+        Tegaki.yNorm = (Tegaki.y - Tegaki.yMin) * (Tegaki.newHeight / Tegaki.oldHeight);
+        normalized_stroke_i.push([Tegaki.xNorm, Tegaki.yNorm]);
       }
       normalizedPattern.push(normalized_stroke_i);
     }
-    Ocr["recordedPattern_" + id] = normalizedPattern;
-    Ocr.redraw(id);
+    Tegaki["recordedPattern_" + id] = normalizedPattern;
+    Tegaki.redraw(id);
   };
 
   // helper functions for moment normalization
 
-  Ocr.m10 = function (pattern) {
+  Tegaki.m10 = function (pattern) {
     var sum = 0;
     for (var i = 0; i < pattern.length; i++) {
       var stroke_i = pattern[i];
@@ -344,7 +344,7 @@ export function OcrFactory(document) {
     return sum;
   };
 
-  Ocr.m01 = function (pattern) {
+  Tegaki.m01 = function (pattern) {
     var sum = 0;
     for (var i = 0; i < pattern.length; i++) {
       var stroke_i = pattern[i];
@@ -355,7 +355,7 @@ export function OcrFactory(document) {
     return sum;
   };
 
-  Ocr.m00 = function (pattern) {
+  Tegaki.m00 = function (pattern) {
     var sum = 0;
     for (var i = 0; i < pattern.length; i++) {
       var stroke_i = pattern[i];
@@ -364,7 +364,7 @@ export function OcrFactory(document) {
     return sum;
   };
 
-  Ocr.mu20 = function (pattern, xc) {
+  Tegaki.mu20 = function (pattern, xc) {
     var sum = 0;
     for (var i = 0; i < pattern.length; i++) {
       var stroke_i = pattern[i];
@@ -376,7 +376,7 @@ export function OcrFactory(document) {
     return sum;
   };
 
-  Ocr.mu02 = function (pattern, yc) {
+  Tegaki.mu02 = function (pattern, yc) {
     var sum = 0;
     for (var i = 0; i < pattern.length; i++) {
       var stroke_i = pattern[i];
@@ -388,7 +388,7 @@ export function OcrFactory(document) {
     return sum;
   };
 
-  Ocr.aran = function (width, height) {
+  Tegaki.aran = function (width, height) {
     var r1 = 0;
     if (height > width) {
       r1 = width / height;
@@ -406,7 +406,7 @@ export function OcrFactory(document) {
     return r2;
   };
 
-  Ocr.chopOverBounds = function (pattern) {
+  Tegaki.chopOverBounds = function (pattern) {
     var chopped = new Array();
     for (var i = 0; i < pattern.length; i++) {
       var stroke_i = pattern[i];
@@ -433,7 +433,7 @@ export function OcrFactory(document) {
     return chopped;
   };
 
-  Ocr.transform = function (pattern, x_, y_) {
+  Tegaki.transform = function (pattern, x_, y_) {
     var pt = new Array();
     for (var i = 0; i < pattern.length; i++) {
       var stroke_i = pattern[i];
@@ -449,53 +449,53 @@ export function OcrFactory(document) {
   };
 
   // main function for moment normalization
-  Ocr.momentNormalize = function (id) {
-    Ocr.newHeight = 256;
-    Ocr.newWidth = 256;
-    Ocr.xMin = 256;
-    Ocr.xMax = 0;
-    Ocr.yMin = 256;
-    Ocr.yMax = 0;
+  Tegaki.momentNormalize = function (id) {
+    Tegaki.newHeight = 256;
+    Tegaki.newWidth = 256;
+    Tegaki.xMin = 256;
+    Tegaki.xMax = 0;
+    Tegaki.yMin = 256;
+    Tegaki.yMax = 0;
     // first determine drawn character width / length
-    for (var i = 0; i < Ocr["recordedPattern_" + id].length; i++) {
-      var stroke_i = Ocr["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
+      var stroke_i = Tegaki["recordedPattern_" + id][i];
       for (var j = 0; j < stroke_i.length; j++) {
-        Ocr.x = stroke_i[j][0];
-        Ocr.y = stroke_i[j][1];
-        if (Ocr.x < Ocr.xMin) {
-          Ocr.xMin = Ocr.x;
+        Tegaki.x = stroke_i[j][0];
+        Tegaki.y = stroke_i[j][1];
+        if (Tegaki.x < Tegaki.xMin) {
+          Tegaki.xMin = Tegaki.x;
         }
-        if (Ocr.x > Ocr.xMax) {
-          Ocr.xMax = Ocr.x;
+        if (Tegaki.x > Tegaki.xMax) {
+          Tegaki.xMax = Tegaki.x;
         }
-        if (Ocr.y < Ocr.yMin) {
-          Ocr.yMin = Ocr.y;
+        if (Tegaki.y < Tegaki.yMin) {
+          Tegaki.yMin = Tegaki.y;
         }
-        if (Ocr.y > Ocr.yMax) {
-          Ocr.yMax = Ocr.y;
+        if (Tegaki.y > Tegaki.yMax) {
+          Tegaki.yMax = Tegaki.y;
         }
       }
     }
-    Ocr.oldHeight = Math.abs(Ocr.yMax - Ocr.yMin);
-    Ocr.oldWidth = Math.abs(Ocr.xMax - Ocr.xMin);
+    Tegaki.oldHeight = Math.abs(Tegaki.yMax - Tegaki.yMin);
+    Tegaki.oldWidth = Math.abs(Tegaki.xMax - Tegaki.xMin);
 
-    var r2 = Ocr.aran(Ocr.oldWidth, Ocr.oldHeight);
+    var r2 = Tegaki.aran(Tegaki.oldWidth, Tegaki.oldHeight);
 
-    var aranWidth = Ocr.newWidth;
-    var aranHeight = Ocr.newHeight;
+    var aranWidth = Tegaki.newWidth;
+    var aranHeight = Tegaki.newHeight;
 
-    if (Ocr.oldHeight > Ocr.oldWidth) {
-      aranWidth = r2 * Ocr.newWidth;
+    if (Tegaki.oldHeight > Tegaki.oldWidth) {
+      aranWidth = r2 * Tegaki.newWidth;
     } else {
-      aranHeight = r2 * Ocr.newHeight;
+      aranHeight = r2 * Tegaki.newHeight;
     }
 
-    var xOffset = (Ocr.newWidth - aranWidth) / 2;
-    var yOffset = (Ocr.newHeight - aranHeight) / 2;
+    var xOffset = (Tegaki.newWidth - aranWidth) / 2;
+    var yOffset = (Tegaki.newHeight - aranHeight) / 2;
 
-    var m00_ = Ocr.m00(Ocr["recordedPattern_" + id]);
-    var m01_ = Ocr.m01(Ocr["recordedPattern_" + id]);
-    var m10_ = Ocr.m10(Ocr["recordedPattern_" + id]);
+    var m00_ = Tegaki.m00(Tegaki["recordedPattern_" + id]);
+    var m01_ = Tegaki.m01(Tegaki["recordedPattern_" + id]);
+    var m10_ = Tegaki.m10(Tegaki["recordedPattern_" + id]);
 
     var xc_ = m10_ / m00_;
     var yc_ = m01_ / m00_;
@@ -503,15 +503,15 @@ export function OcrFactory(document) {
     var xc_half = aranWidth / 2;
     var yc_half = aranHeight / 2;
 
-    var mu20_ = Ocr.mu20(Ocr["recordedPattern_" + id], xc_);
-    var mu02_ = Ocr.mu02(Ocr["recordedPattern_" + id], yc_);
+    var mu20_ = Tegaki.mu20(Tegaki["recordedPattern_" + id], xc_);
+    var mu02_ = Tegaki.mu02(Tegaki["recordedPattern_" + id], yc_);
 
     var alpha = aranWidth / (4 * Math.sqrt(mu20_ / m00_)) || 0;
     var beta = aranHeight / (4 * Math.sqrt(mu02_ / m00_)) || 0;
 
     var nf = new Array();
-    for (var i = 0; i < Ocr["recordedPattern_" + id].length; i++) {
-      var si = Ocr["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
+      var si = Tegaki["recordedPattern_" + id][i];
       var nsi = new Array();
       for (var j = 0; j < si.length; j++) {
         var newX = alpha * (si[j][0] - xc_) + xc_half;
@@ -522,11 +522,11 @@ export function OcrFactory(document) {
       nf.push(nsi);
     }
 
-    return Ocr.transform(nf, xOffset, yOffset);
+    return Tegaki.transform(nf, xOffset, yOffset);
   };
 
   // distance functions
-  Ocr.euclid = function (x1y1, x2y2) {
+  Tegaki.euclid = function (x1y1, x2y2) {
     var a = x1y1[0] - x2y2[0];
     var b = x1y1[1] - x2y2[1];
     var c = Math.sqrt(a * a + b * b);
@@ -534,7 +534,7 @@ export function OcrFactory(document) {
   };
 
   // extract points in regular intervals
-  Ocr.extractFeatures = function (input_data, interval) {
+  Tegaki.extractFeatures = function (input_data, interval) {
     var extractedPattern = new Array();
     var nrStrokes = input_data.length;
     for (var i = 0; i < nrStrokes; i++) {
@@ -551,7 +551,7 @@ export function OcrFactory(document) {
         if (j > 0) {
           var x1y1 = stroke_i[j - 1];
           var x2y2 = stroke_i[j];
-          dist += Ocr.euclid(x1y1, x2y2);
+          dist += Tegaki.euclid(x1y1, x2y2);
         }
         if (dist >= interval && j > 1) {
           dist = dist - interval;
@@ -576,19 +576,19 @@ export function OcrFactory(document) {
   };
 
   /* test extraction function
-   Ocr.extractTest = function () {
-      //var ex = Ocr.extractFeatures(Ocr["recordedPattern_" + id], 20.);
-	  //Ocr["recordedPattern_" + id] = ex;
+   Tegaki.extractTest = function () {
+      //var ex = Tegaki.extractFeatures(Tegaki["recordedPattern_" + id], 20.);
+	  //Tegaki["recordedPattern_" + id] = ex;
 
-      //Ocr.redraw(id);
+      //Tegaki.redraw(id);
 
 	  var norm = normalizeLinearTest(test4);
-	  var ex = Ocr.extractFeatures(norm, 20.);
+	  var ex = Tegaki.extractFeatures(norm, 20.);
 	  //console.log(ex);
 
    }*/
 
-  Ocr.endPointDistance = function (pattern1, pattern2) {
+  Tegaki.endPointDistance = function (pattern1, pattern2) {
     var dist = 0;
     var l1 = typeof pattern1 == "undefined" ? 0 : pattern1.length;
     var l2 = typeof pattern2 == "undefined" ? 0 : pattern2.length;
@@ -605,7 +605,7 @@ export function OcrFactory(document) {
     return dist;
   };
 
-  Ocr.initialDistance = function (pattern1, pattern2) {
+  Tegaki.initialDistance = function (pattern1, pattern2) {
     var l1 = pattern1.length;
     var l2 = pattern2.length;
     var l_min = Math.min(l1, l2);
@@ -623,7 +623,7 @@ export function OcrFactory(document) {
   // and return quadruple with sorted patterns and their
   // stroke numbers [k1,k2,n,m] where n >= m and
   // they denote the #of strokes of k1 and k2
-  Ocr.getLargerAndSize = function (pattern1, pattern2) {
+  Tegaki.getLargerAndSize = function (pattern1, pattern2) {
     var l1 = typeof pattern1 == "undefined" ? 0 : pattern1.length;
     var l2 = typeof pattern2 == "undefined" ? 0 : pattern2.length;
     // definitions as in paper
@@ -641,14 +641,14 @@ export function OcrFactory(document) {
     return [k1, k2, n, m];
   };
 
-  Ocr.wholeWholeDistance = function (pattern1, pattern2) {
+  Tegaki.wholeWholeDistance = function (pattern1, pattern2) {
     // [k1, k2, n, m]
     // a[0], a[1], a[2], a[3]
-    var a = Ocr.getLargerAndSize(pattern1, pattern2);
+    var a = Tegaki.getLargerAndSize(pattern1, pattern2);
     var dist = 0;
     for (var i = 0; i < a[3]; i++) {
-      Ocr.j_of_i = parseInt(parseInt(a[2] / a[3]) * i);
-      var x1y1 = a[0][Ocr.j_of_i];
+      Tegaki.j_of_i = parseInt(parseInt(a[2] / a[3]) * i);
+      var x1y1 = a[0][Tegaki.j_of_i];
       var x2y2 = a[1][i];
       dist += Math.abs(x1y1[0] - x2y2[0]) + Math.abs(x1y1[1] - x2y2[1]);
     }
@@ -656,10 +656,10 @@ export function OcrFactory(document) {
   };
 
   // initialize N-stroke map by greedy initialization
-  Ocr.initStrokeMap = function (pattern1, pattern2, distanceMetric) {
+  Tegaki.initStrokeMap = function (pattern1, pattern2, distanceMetric) {
     // [k1, k2, n, m]
     // a[0], a[1], a[2], a[3]
-    var a = Ocr.getLargerAndSize(pattern1, pattern2);
+    var a = Tegaki.getLargerAndSize(pattern1, pattern2);
     // larger is now k1 with length n
     var map = new Array();
     for (var i = 0; i < a[2]; i++) {
@@ -670,35 +670,35 @@ export function OcrFactory(document) {
       free[i] = true;
     }
     for (var i = 0; i < a[3]; i++) {
-      Ocr.minDist = 10000000;
-      Ocr.min_j = -1;
+      Tegaki.minDist = 10000000;
+      Tegaki.min_j = -1;
       for (var j = 0; j < a[2]; j++) {
         if (free[j] == true) {
           var d = distanceMetric(a[0][j], a[1][i]);
-          if (d < Ocr.minDist) {
-            Ocr.minDist = d;
-            Ocr.min_j = j;
+          if (d < Tegaki.minDist) {
+            Tegaki.minDist = d;
+            Tegaki.min_j = j;
           }
         }
       }
-      free[Ocr.min_j] = false;
-      map[Ocr.min_j] = i;
+      free[Tegaki.min_j] = false;
+      map[Tegaki.min_j] = i;
     }
     return map;
   };
 
   // get best N-stroke map by iterative improvement
-  Ocr.getMap = function (pattern1, pattern2, distanceMetric) {
+  Tegaki.getMap = function (pattern1, pattern2, distanceMetric) {
     // [k1, k2, n, m]
     // a[0], a[1], a[2], a[3]
-    var a = Ocr.getLargerAndSize(pattern1, pattern2);
+    var a = Tegaki.getLargerAndSize(pattern1, pattern2);
     // larger is now k1 with length n
     var L = 3;
-    var map = Ocr.initStrokeMap(a[0], a[1], distanceMetric);
+    var map = Tegaki.initStrokeMap(a[0], a[1], distanceMetric);
     for (var l = 0; l < L; l++) {
       for (var i = 0; i < map.length; i++) {
         if (map[i] != -1) {
-          Ocr.dii = distanceMetric(a[0][i], a[1][map[i]]);
+          Tegaki.dii = distanceMetric(a[0][i], a[1][map[i]]);
           for (var j = 0; j < map.length; j++) {
             // we need to check again, since
             // manipulation of map[i] can occur within
@@ -708,18 +708,18 @@ export function OcrFactory(document) {
                 var djj = distanceMetric(a[0][j], a[1][map[j]]);
                 var dij = distanceMetric(a[0][j], a[1][map[i]]);
                 var dji = distanceMetric(a[0][i], a[1][map[j]]);
-                if (dji + dij < Ocr.dii + djj) {
+                if (dji + dij < Tegaki.dii + djj) {
                   var map_j = map[j];
                   map[j] = map[i];
                   map[i] = map_j;
-                  Ocr.dii = dij;
+                  Tegaki.dii = dij;
                 }
               } else {
                 var dij = distanceMetric(a[0][j], a[1][map[i]]);
-                if (dij < Ocr.dii) {
+                if (dij < Tegaki.dii) {
                   map[j] = map[i];
                   map[i] = -1;
-                  Ocr.dii = dij;
+                  Tegaki.dii = dij;
                 }
               }
             }
@@ -731,10 +731,10 @@ export function OcrFactory(document) {
   };
 
   // from optimal N-stroke map create M-N stroke map
-  Ocr.completeMap = function (pattern1, pattern2, distanceMetric, map) {
+  Tegaki.completeMap = function (pattern1, pattern2, distanceMetric, map) {
     // [k1, k2, _, _]
     // a[0], a[1], a[2], a[3]
-    var a = Ocr.getLargerAndSize(pattern1, pattern2);
+    var a = Tegaki.getLargerAndSize(pattern1, pattern2);
     if (!map.includes(-1)) {
       return map;
     }
@@ -815,10 +815,10 @@ export function OcrFactory(document) {
 
   // given two patterns, M-N stroke map and distanceMetric function,
   // compute overall distance between two patterns
-  Ocr.computeDistance = function (pattern1, pattern2, distanceMetric, map) {
+  Tegaki.computeDistance = function (pattern1, pattern2, distanceMetric, map) {
     // [k1, k2, n, m]
     // a[0], a[1], a[2], a[3]
-    var a = Ocr.getLargerAndSize(pattern1, pattern2);
+    var a = Tegaki.getLargerAndSize(pattern1, pattern2);
     var dist = 0.0;
     var idx = 0;
     while (idx < a[2]) {
@@ -840,10 +840,10 @@ export function OcrFactory(document) {
 
   // given two patterns, M-N stroke_map, compute weighted (respect stroke
   // length when there are concatenated strokes using the wholeWhole distance
-  Ocr.computeWholeDistanceWeighted = function (pattern1, pattern2, map) {
+  Tegaki.computeWholeDistanceWeighted = function (pattern1, pattern2, map) {
     // [k1, k2, n, m]
     // a[0], a[1], a[2], a[3]
-    var a = Ocr.getLargerAndSize(pattern1, pattern2);
+    var a = Tegaki.getLargerAndSize(pattern1, pattern2);
     var dist = 0.0;
     var idx = 0;
     while (idx < a[2]) {
@@ -858,7 +858,7 @@ export function OcrFactory(document) {
         stroke_concat = stroke_concat.concat(a[0][temp]);
       }
 
-      var dist_idx = Ocr.wholeWholeDistance(stroke_idx, stroke_concat);
+      var dist_idx = Tegaki.wholeWholeDistance(stroke_idx, stroke_concat);
       if (stop > start + 1) {
         // concatenated stroke, adjust weight
         var mm = typeof stroke_idx == "undefined" ? 0 : stroke_idx.length;
@@ -878,16 +878,16 @@ export function OcrFactory(document) {
 
   // apply coarse classfication w.r.t. inputPattern
   // considering _all_ referencePatterns using endpoint distance
-  Ocr.coarseClassification = function (inputPattern) {
+  Tegaki.coarseClassification = function (inputPattern) {
     var inputLength = inputPattern.length;
     var candidates = [];
-    for (var i = 0; i < Ocr.refPatterns.length; i++) {
-      var iLength = Ocr.refPatterns[i][1];
+    for (var i = 0; i < Tegaki.refPatterns.length; i++) {
+      var iLength = Tegaki.refPatterns[i][1];
       if (inputLength < iLength + 2 && inputLength > iLength - 3) {
-        var iPattern = Ocr.refPatterns[i][2];
-        var iMap = Ocr.getMap(iPattern, inputPattern, Ocr.endPointDistance);
-        iMap = Ocr.completeMap(iPattern, inputPattern, Ocr.endPointDistance, iMap);
-        var dist = Ocr.computeDistance(iPattern, inputPattern, Ocr.endPointDistance, iMap);
+        var iPattern = Tegaki.refPatterns[i][2];
+        var iMap = Tegaki.getMap(iPattern, inputPattern, Tegaki.endPointDistance);
+        iMap = Tegaki.completeMap(iPattern, inputPattern, Tegaki.endPointDistance, iMap);
+        var dist = Tegaki.computeDistance(iPattern, inputPattern, Tegaki.endPointDistance, iMap);
         var m = iLength;
         var n = iPattern.length;
         if (n < m) {
@@ -907,7 +907,7 @@ export function OcrFactory(document) {
 	       outStr += candidates[i][0];
 		   outStr += " ";
 		   outStr += candidates[i][1];
-		   outStr += Ocr.refPatterns[candidates[i][0]][0];
+		   outStr += Tegaki.refPatterns[candidates[i][0]][0];
 		   outStr += "|";
 	   }
 	   document.getElementById("coarseCandidateList").innerHTML = outStr;
@@ -917,26 +917,26 @@ export function OcrFactory(document) {
 
   // fine classfication. returns best 100 matches for inputPattern
   // and candidate list (which should be provided by coarse classification
-  Ocr.fineClassification = function (inputPattern, inputCandidates) {
+  Tegaki.fineClassification = function (inputPattern, inputCandidates) {
     var inputLength = inputPattern.length;
     var candidates = [];
     for (var i = 0; i < Math.min(inputCandidates.length, 100); i++) {
       var j = inputCandidates[i][0];
-      var iLength = Ocr.refPatterns[j][1];
-      var iPattern = Ocr.refPatterns[j][2];
+      var iLength = Tegaki.refPatterns[j][1];
+      var iPattern = Tegaki.refPatterns[j][2];
       if (inputLength < iLength + 2 && inputLength > iLength - 3) {
-        var iMap = Ocr.getMap(iPattern, inputPattern, Ocr.initialDistance);
+        var iMap = Tegaki.getMap(iPattern, inputPattern, Tegaki.initialDistance);
 
-        iMap = Ocr.completeMap(iPattern, inputPattern, Ocr.wholeWholeDistance, iMap);
-        if (Ocr.refPatterns[j][0] == "委") {
+        iMap = Tegaki.completeMap(iPattern, inputPattern, Tegaki.wholeWholeDistance, iMap);
+        if (Tegaki.refPatterns[j][0] == "委") {
           console.log("finished imap, fine:");
           console.log(iMap);
           console.log("weight:");
-          console.log(Ocr.computeDistance(iPattern, inputPattern, Ocr.wholeWholeDistance, iMap));
+          console.log(Tegaki.computeDistance(iPattern, inputPattern, Tegaki.wholeWholeDistance, iMap));
           console.log("weight intended:");
-          console.log(Ocr.computeDistance(iPattern, inputPattern, Ocr.wholeWholeDistance, [0, 1, 2, 3, 4, 7, 5, 6]));
+          console.log(Tegaki.computeDistance(iPattern, inputPattern, Tegaki.wholeWholeDistance, [0, 1, 2, 3, 4, 7, 5, 6]));
         }
-        var dist = Ocr.computeWholeDistanceWeighted(iPattern, inputPattern, iMap);
+        var dist = Tegaki.computeWholeDistanceWeighted(iPattern, inputPattern, iMap);
         var n = inputLength;
         var m = iPattern.length;
         if (m > n) {
@@ -954,7 +954,7 @@ export function OcrFactory(document) {
       //outStr += candidates[i][0];
       //outStr += " ";
       //outStr += candidates[i][1];
-      outStr += Ocr.refPatterns[candidates[i][0]][0];
+      outStr += Tegaki.refPatterns[candidates[i][0]][0];
       outStr += "  ";
     }
     //document.getElementById("candidateList").innerHTML = outStr;
@@ -963,7 +963,7 @@ export function OcrFactory(document) {
   };
 
   /* test function for N-pair and M-N stroke map computation
-	 Ocr.testMap = function() {
+	 Tegaki.testMap = function() {
 	  // var map = initStrokeMap(test_k21,test_k2,endPointDistance);
 	    // should give
         // 0  1  2 3
@@ -996,21 +996,21 @@ export function OcrFactory(document) {
 	}
 	*/
 
-  Ocr.recognize = function (id) {
-    var mn = Ocr.momentNormalize(id);
+  Tegaki.recognize = function (id) {
+    var mn = Tegaki.momentNormalize(id);
 
-    var extractedFeatures = Ocr.extractFeatures(mn, 20);
+    var extractedFeatures = Tegaki.extractFeatures(mn, 20);
 
-    var map = Ocr.getMap(extractedFeatures, Ocr.refPatterns[0][2], Ocr.endPointDistance);
-    map = Ocr.completeMap(extractedFeatures, Ocr.refPatterns[0][2], Ocr.endPointDistance, map);
+    var map = Tegaki.getMap(extractedFeatures, Tegaki.refPatterns[0][2], Tegaki.endPointDistance);
+    map = Tegaki.completeMap(extractedFeatures, Tegaki.refPatterns[0][2], Tegaki.endPointDistance, map);
 
-    var candidates = Ocr.coarseClassification(extractedFeatures);
+    var candidates = Tegaki.coarseClassification(extractedFeatures);
 
-    Ocr.redraw(id);
+    Tegaki.redraw(id);
 
     // display candidates in the specified element
-    if (Ocr["canvas_" + id].dataset.candidateList) {
-      document.getElementById(Ocr["canvas_" + id].dataset.candidateList).innerHTML = Ocr.fineClassification(
+    if (Tegaki["canvas_" + id].dataset.candidateList) {
+      document.getElementById(Tegaki["canvas_" + id].dataset.candidateList).innerHTML = Tegaki.fineClassification(
         extractedFeatures,
         candidates,
       );
@@ -1018,17 +1018,17 @@ export function OcrFactory(document) {
 
     // otherwise log the result to the console if no candidateList is specified
     else {
-      return Ocr.fineClassification(extractedFeatures, candidates);
+      return Tegaki.fineClassification(extractedFeatures, candidates);
     }
   };
 
   /* test moment normalization
 	function MomentTest() {
-	  Ocr["recordedPattern_" + id] = test4;
-	  var mn = Ocr.momentNormalize(id);
-	  Ocr["recordedPattern_" + id] = mn;
+	  Tegaki["recordedPattern_" + id] = test4;
+	  var mn = Tegaki.momentNormalize(id);
+	  Tegaki["recordedPattern_" + id] = mn;
 	  console.log(mn);
-	  Ocr.redraw(id);
+	  Tegaki.redraw(id);
 
 	} */
 
@@ -1036,20 +1036,20 @@ export function OcrFactory(document) {
 	   as array to clipboard
 	   i.e. to add missing patterns
 	*/
-  Ocr.copyStuff = function (id) {
-    Ocr.s = "";
+  Tegaki.copyStuff = function (id) {
+    Tegaki.s = "";
 
-    for (var i = 0, j = Ocr["recordedPattern_" + id].length; i < j; i++) {
-      console.log(i + 1, Ocr["recordedPattern_" + id][i], Ocr["recordedPattern_" + id][i].toString());
-      console.log(Ocr["recordedPattern_" + id][i]);
-      console.log(JSON.stringify(Ocr["recordedPattern_" + id][i]));
-      Ocr.s += "[" + JSON.stringify(Ocr["recordedPattern_" + id][i]) + "],";
+    for (var i = 0, j = Tegaki["recordedPattern_" + id].length; i < j; i++) {
+      console.log(i + 1, Tegaki["recordedPattern_" + id][i], Tegaki["recordedPattern_" + id][i].toString());
+      console.log(Tegaki["recordedPattern_" + id][i]);
+      console.log(JSON.stringify(Tegaki["recordedPattern_" + id][i]));
+      Tegaki.s += "[" + JSON.stringify(Tegaki["recordedPattern_" + id][i]) + "],";
     }
 
-    Ocr.copyToClipboard(Ocr.s);
+    Tegaki.copyToClipboard(Tegaki.s);
   };
 
-  Ocr.copyToClipboard = function (str) {
+  Tegaki.copyToClipboard = function (str) {
     var el = document.createElement("textarea");
     el.value = str;
     document.body.appendChild(el);
@@ -1062,24 +1062,24 @@ export function OcrFactory(document) {
   document.addEventListener("keydown", function (e) {
     var id = document.activeElement.id;
 
-    if (Ocr["canvas_" + id] && e.ctrlKey) {
+    if (Tegaki["canvas_" + id] && e.ctrlKey) {
       switch (e.key.toLowerCase()) {
         // undo
         case "z":
           e.preventDefault();
-          Ocr.deleteLast(id);
+          Tegaki.deleteLast(id);
           break;
 
         // erase
         case "x":
           e.preventDefault();
-          Ocr.erase(id);
+          Tegaki.erase(id);
           break;
 
         // recognize
         case "f":
           e.preventDefault();
-          Ocr.recognize(id);
+          Tegaki.recognize(id);
           break;
 
         default:
@@ -1088,5 +1088,5 @@ export function OcrFactory(document) {
     }
   });
 
-  return Ocr;
+  return Tegaki;
 }
