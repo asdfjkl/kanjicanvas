@@ -1,7 +1,7 @@
 module.exports = {
   version: "0.2",
   language: "en",
-  words: ["aran", "classfication", "dominik", "drawio", "outdir", "tegaki", "ubugeeei", "xmls"],
+  words: ["aran", "classfication", "dominik", "drawio", "hono", "outdir", "tegaki", "ubugeeei", "xmls"],
   dictionaries: [
     "softwareTerms",
     "misc",
