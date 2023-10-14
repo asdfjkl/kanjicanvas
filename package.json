@@ -18,7 +18,8 @@
     "build:types": "tsc --project tsconfig.json",
     "fmt": "prettier",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint",
-    "spell-check": "cspell lint \"**\" --no-progress --show-suggestions --show-context --cache"
+    "spell-check": "cspell lint \"**\" --no-progress --show-suggestions --show-context --cache",
+    "play": "cd examples/_basic && pnpm run dev"
   },
   "devDependencies": {
     "cspell": "^7.3.8",

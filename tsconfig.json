@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    "moduleResolution": "node",
     "outDir": "dist",
     "emitDeclarationOnly": true,
     "declarationDir": "dist/types",
@@ -10,7 +11,14 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "allowJs": true
+    "allowJs": true,
+    "paths": {
+      "@tegaki/*": [
+        "./packages/*"
+      ],
+    }
   },
-  "include": ["./packages/**/*.ts"]
+  "include": [
+    "./packages/**/*.ts"
+  ]
 }

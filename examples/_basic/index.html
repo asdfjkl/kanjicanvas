@@ -7,7 +7,16 @@
     <title>Vite + TS</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <canvas id="tegaki-sample" data-candidate-list="candidateList" width="500" height="500"></canvas>
+      <div id="candidateList"></div>
+
+      <div class="controllers">
+        <button id="recognize-btn">recognize</button>
+        <button id="undo-btn">undo</button>
+        <button id="erase-btn">erase</button>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
