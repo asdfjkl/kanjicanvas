@@ -12,7 +12,5 @@
     "forceConsistentCasingInFileNames": true,
     "allowJs": true
   },
-  "include": [
-    "./packages/**/*.ts"
-, "packages/frontend/next.js", "packages/frontend/index.js"  ]
+  "include": ["./packages/**/*.ts"]
 }
