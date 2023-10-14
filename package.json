@@ -13,11 +13,13 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "fmt": "prettier --write"
   },
   "devDependencies": {
     "esbuild": "^0.19.4",
-    "husky": "^8.0.3"
+    "husky": "^8.0.3",
+    "prettier": "^3.0.3"
   },
   "volta": {
     "node": "18.18.2"

@@ -66,35 +66,35 @@ export function OcrFactory(document) {
       function (e) {
         Ocr.findxy("move", e, id);
       },
-      false
+      false,
     );
     Ocr["canvas_" + id].addEventListener(
       "mousedown",
       function (e) {
         Ocr.findxy("down", e, id);
       },
-      false
+      false,
     );
     Ocr["canvas_" + id].addEventListener(
       "mouseup",
       function (e) {
         Ocr.findxy("up", e, id);
       },
-      false
+      false,
     );
     Ocr["canvas_" + id].addEventListener(
       "mouseout",
       function (e) {
         Ocr.findxy("out", e, id);
       },
-      false
+      false,
     );
     Ocr["canvas_" + id].addEventListener(
       "mouseover",
       function (e) {
         Ocr.findxy("over", e, id);
       },
-      false
+      false,
     );
 
     // touch events
@@ -103,21 +103,21 @@ export function OcrFactory(document) {
       function (e) {
         Ocr.findxy("move", e, id);
       },
-      false
+      false,
     );
     Ocr["canvas_" + id].addEventListener(
       "touchstart",
       function (e) {
         Ocr.findxy("down", e, id);
       },
-      false
+      false,
     );
     Ocr["canvas_" + id].addEventListener(
       "touchend",
       function (e) {
         Ocr.findxy("up", e, id);
       },
-      false
+      false,
     );
   };
 
@@ -244,17 +244,11 @@ export function OcrFactory(document) {
 
         // outline
         Ocr["ctx_" + id].lineWidth = 3;
-        Ocr["ctx_" + id].strokeStyle = Ocr.alterHex(
-          Ocr.strokeColors[i] ? Ocr.strokeColors[i] : "#333333",
-          60,
-          "dec"
-        );
+        Ocr["ctx_" + id].strokeStyle = Ocr.alterHex(Ocr.strokeColors[i] ? Ocr.strokeColors[i] : "#333333", 60, "dec");
         Ocr["ctx_" + id].strokeText((i + 1).toString(), x, y);
 
         // fill
-        Ocr["ctx_" + id].fillStyle = Ocr.strokeColors[i]
-          ? Ocr.strokeColors[i]
-          : "#333";
+        Ocr["ctx_" + id].fillStyle = Ocr.strokeColors[i] ? Ocr.strokeColors[i] : "#333";
         Ocr["ctx_" + id].fillText((i + 1).toString(), x, y);
       }
     }
@@ -264,26 +258,18 @@ export function OcrFactory(document) {
   // ex: Ocr.alterHex(Ocr.strokeColors[0], 60, 'dec'); // decrement all colors by 60 (use 'inc' to increment)
   Ocr.alterHex = function (hex, number, action) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex),
-      color = [
-        parseInt(result[1], 16),
-        parseInt(result[2], 16),
-        parseInt(result[3], 16),
-      ],
+      color = [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)],
       i = 0,
       j = color.length;
 
     for (; i < j; i++) {
       switch (action) {
         case "inc":
-          color[i] = (
-            color[i] + number > 255 ? 255 : color[i] + number
-          ).toString(16);
+          color[i] = (color[i] + number > 255 ? 255 : color[i] + number).toString(16);
           break;
 
         case "dec":
-          color[i] = (color[i] - number < 0 ? 0 : color[i] - number).toString(
-            16
-          );
+          color[i] = (color[i] - number < 0 ? 0 : color[i] - number).toString(16);
           break;
 
         default:
@@ -900,18 +886,8 @@ export function OcrFactory(document) {
       if (inputLength < iLength + 2 && inputLength > iLength - 3) {
         var iPattern = Ocr.refPatterns[i][2];
         var iMap = Ocr.getMap(iPattern, inputPattern, Ocr.endPointDistance);
-        iMap = Ocr.completeMap(
-          iPattern,
-          inputPattern,
-          Ocr.endPointDistance,
-          iMap
-        );
-        var dist = Ocr.computeDistance(
-          iPattern,
-          inputPattern,
-          Ocr.endPointDistance,
-          iMap
-        );
+        iMap = Ocr.completeMap(iPattern, inputPattern, Ocr.endPointDistance, iMap);
+        var dist = Ocr.computeDistance(iPattern, inputPattern, Ocr.endPointDistance, iMap);
         var m = iLength;
         var n = iPattern.length;
         if (n < m) {
@@ -951,39 +927,16 @@ export function OcrFactory(document) {
       if (inputLength < iLength + 2 && inputLength > iLength - 3) {
         var iMap = Ocr.getMap(iPattern, inputPattern, Ocr.initialDistance);
 
-        iMap = Ocr.completeMap(
-          iPattern,
-          inputPattern,
-          Ocr.wholeWholeDistance,
-          iMap
-        );
+        iMap = Ocr.completeMap(iPattern, inputPattern, Ocr.wholeWholeDistance, iMap);
         if (Ocr.refPatterns[j][0] == "委") {
           console.log("finished imap, fine:");
           console.log(iMap);
           console.log("weight:");
-          console.log(
-            Ocr.computeDistance(
-              iPattern,
-              inputPattern,
-              Ocr.wholeWholeDistance,
-              iMap
-            )
-          );
+          console.log(Ocr.computeDistance(iPattern, inputPattern, Ocr.wholeWholeDistance, iMap));
           console.log("weight intended:");
-          console.log(
-            Ocr.computeDistance(
-              iPattern,
-              inputPattern,
-              Ocr.wholeWholeDistance,
-              [0, 1, 2, 3, 4, 7, 5, 6]
-            )
-          );
+          console.log(Ocr.computeDistance(iPattern, inputPattern, Ocr.wholeWholeDistance, [0, 1, 2, 3, 4, 7, 5, 6]));
         }
-        var dist = Ocr.computeWholeDistanceWeighted(
-          iPattern,
-          inputPattern,
-          iMap
-        );
+        var dist = Ocr.computeWholeDistanceWeighted(iPattern, inputPattern, iMap);
         var n = inputLength;
         var m = iPattern.length;
         if (m > n) {
@@ -1048,17 +1001,8 @@ export function OcrFactory(document) {
 
     var extractedFeatures = Ocr.extractFeatures(mn, 20);
 
-    var map = Ocr.getMap(
-      extractedFeatures,
-      Ocr.refPatterns[0][2],
-      Ocr.endPointDistance
-    );
-    map = Ocr.completeMap(
-      extractedFeatures,
-      Ocr.refPatterns[0][2],
-      Ocr.endPointDistance,
-      map
-    );
+    var map = Ocr.getMap(extractedFeatures, Ocr.refPatterns[0][2], Ocr.endPointDistance);
+    map = Ocr.completeMap(extractedFeatures, Ocr.refPatterns[0][2], Ocr.endPointDistance, map);
 
     var candidates = Ocr.coarseClassification(extractedFeatures);
 
@@ -1066,9 +1010,10 @@ export function OcrFactory(document) {
 
     // display candidates in the specified element
     if (Ocr["canvas_" + id].dataset.candidateList) {
-      document.getElementById(
-        Ocr["canvas_" + id].dataset.candidateList
-      ).innerHTML = Ocr.fineClassification(extractedFeatures, candidates);
+      document.getElementById(Ocr["canvas_" + id].dataset.candidateList).innerHTML = Ocr.fineClassification(
+        extractedFeatures,
+        candidates,
+      );
     }
 
     // otherwise log the result to the console if no candidateList is specified
@@ -1095,11 +1040,7 @@ export function OcrFactory(document) {
     Ocr.s = "";
 
     for (var i = 0, j = Ocr["recordedPattern_" + id].length; i < j; i++) {
-      console.log(
-        i + 1,
-        Ocr["recordedPattern_" + id][i],
-        Ocr["recordedPattern_" + id][i].toString()
-      );
+      console.log(i + 1, Ocr["recordedPattern_" + id][i], Ocr["recordedPattern_" + id][i].toString());
       console.log(Ocr["recordedPattern_" + id][i]);
       console.log(JSON.stringify(Ocr["recordedPattern_" + id][i]));
       Ocr.s += "[" + JSON.stringify(Ocr["recordedPattern_" + id][i]) + "],";

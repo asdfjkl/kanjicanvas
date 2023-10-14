@@ -3,17 +3,7 @@ module.exports = {
   maxMessageLength: 300,
   minMessageLength: 2,
   format: "{type}: {emoji}{subject}",
-  list: [
-    "feat",
-    "chapter",
-    "fix",
-    "refactor",
-    "style",
-    "pkg",
-    "test",
-    "tweak",
-    "other",
-  ],
+  list: ["feat", "chapter", "fix", "refactor", "style", "pkg", "test", "tweak", "other"],
   questions: ["type", "subject"],
   scopes: [],
   types: {
