@@ -46,50 +46,50 @@ export function createTegaki(document) {
 
   // init canvas
   Tegaki.init = function (id) {
-    Tegaki["canvas_" + id] = document.getElementById(id);
-    Tegaki["canvas_" + id].tabIndex = 0; // makes canvas focusable, allowing usage of shortcuts
-    Tegaki["ctx_" + id] = Tegaki["canvas_" + id].getContext("2d");
-    Tegaki["w_" + id] = Tegaki["canvas_" + id].width;
-    Tegaki["h_" + id] = Tegaki["canvas_" + id].height;
-    Tegaki["flagOver_" + id] = false;
-    Tegaki["flagDown_" + id] = false;
-    Tegaki["prevX_" + id] = 0;
-    Tegaki["currX_" + id] = 0;
-    Tegaki["prevY_" + id] = 0;
-    Tegaki["currY_" + id] = 0;
-    Tegaki["dot_flag_" + id] = false;
-    Tegaki["recordedPattern_" + id] = new Array();
-    Tegaki["currentLine_" + id] = null;
+    Tegaki.canvas = document.getElementById(id);
+    Tegaki.canvas.tabIndex = 0; // makes canvas focusable, allowing usage of shortcuts
+    Tegaki.ctx = Tegaki.canvas.getContext("2d");
+    Tegaki.w = Tegaki.canvas.width;
+    Tegaki.h = Tegaki.canvas.height;
+    Tegaki.flagOver = false;
+    Tegaki.flagDown = false;
+    Tegaki.prevX = 0;
+    Tegaki.currX = 0;
+    Tegaki.prevY = 0;
+    Tegaki.currY = 0;
+    Tegaki.dot_flag = false;
+    Tegaki.recordedPattern = new Array();
+    Tegaki.currentLine = null;
 
-    Tegaki["canvas_" + id].addEventListener(
+    Tegaki.canvas.addEventListener(
       "mousemove",
       function (e) {
         Tegaki.find_x_y("move", e, id);
       },
       false,
     );
-    Tegaki["canvas_" + id].addEventListener(
+    Tegaki.canvas.addEventListener(
       "mousedown",
       function (e) {
         Tegaki.find_x_y("down", e, id);
       },
       false,
     );
-    Tegaki["canvas_" + id].addEventListener(
+    Tegaki.canvas.addEventListener(
       "mouseup",
       function (e) {
         Tegaki.find_x_y("up", e, id);
       },
       false,
     );
-    Tegaki["canvas_" + id].addEventListener(
+    Tegaki.canvas.addEventListener(
       "mouseout",
       function (e) {
         Tegaki.find_x_y("out", e, id);
       },
       false,
     );
-    Tegaki["canvas_" + id].addEventListener(
+    Tegaki.canvas.addEventListener(
       "mouseover",
       function (e) {
         Tegaki.find_x_y("over", e, id);
@@ -98,21 +98,21 @@ export function createTegaki(document) {
     );
 
     // touch events
-    Tegaki["canvas_" + id].addEventListener(
+    Tegaki.canvas.addEventListener(
       "touchmove",
       function (e) {
         Tegaki.find_x_y("move", e, id);
       },
       false,
     );
-    Tegaki["canvas_" + id].addEventListener(
+    Tegaki.canvas.addEventListener(
       "touchstart",
       function (e) {
         Tegaki.find_x_y("down", e, id);
       },
       false,
     );
-    Tegaki["canvas_" + id].addEventListener(
+    Tegaki.canvas.addEventListener(
       "touchend",
       function (e) {
         Tegaki.find_x_y("up", e, id);
@@ -122,37 +122,37 @@ export function createTegaki(document) {
   };
 
   Tegaki.draw = function (id, color) {
-    Tegaki["ctx_" + id].beginPath();
-    Tegaki["ctx_" + id].moveTo(Tegaki["prevX_" + id], Tegaki["prevY_" + id]);
-    Tegaki["ctx_" + id].lineTo(Tegaki["currX_" + id], Tegaki["currY_" + id]);
-    Tegaki["ctx_" + id].strokeStyle = color ? color : "#333";
-    Tegaki["ctx_" + id].lineCap = "round";
-    //Tegaki["ctx_" + id].lineJoin = "round";
-    //Tegaki["ctx_" + id].lineMiter = "round";
-    Tegaki["ctx_" + id].lineWidth = 4;
-    Tegaki["ctx_" + id].stroke();
-    Tegaki["ctx_" + id].closePath();
+    Tegaki.ctx.beginPath();
+    Tegaki.ctx.moveTo(Tegaki.prevX, Tegaki.prevY);
+    Tegaki.ctx.lineTo(Tegaki.currX, Tegaki.currY);
+    Tegaki.ctx.strokeStyle = color ? color : "#333";
+    Tegaki.ctx.lineCap = "round";
+    //Tegaki.ctx.lineJoin = "round";
+    //Tegaki.ctx.lineMiter = "round";
+    Tegaki.ctx.lineWidth = 4;
+    Tegaki.ctx.stroke();
+    Tegaki.ctx.closePath();
   };
 
   Tegaki.deleteLast = function (id) {
-    Tegaki["ctx_" + id].clearRect(0, 0, Tegaki["w_" + id], Tegaki["h_" + id]);
-    for (var i = 0; i < Tegaki["recordedPattern_" + id].length - 1; i++) {
-      var stroke_i = Tegaki["recordedPattern_" + id][i];
+    Tegaki.ctx.clearRect(0, 0, Tegaki.w, Tegaki.h);
+    for (var i = 0; i < Tegaki.recordedPattern.length - 1; i++) {
+      var stroke_i = Tegaki.recordedPattern[i];
       for (var j = 0; j < stroke_i.length - 1; j++) {
-        Tegaki["prevX_" + id] = stroke_i[j][0];
-        Tegaki["prevY_" + id] = stroke_i[j][1];
+        Tegaki.prevX = stroke_i[j][0];
+        Tegaki.prevY = stroke_i[j][1];
 
-        Tegaki["currX_" + id] = stroke_i[j + 1][0];
-        Tegaki["currY_" + id] = stroke_i[j + 1][1];
+        Tegaki.currX = stroke_i[j + 1][0];
+        Tegaki.currY = stroke_i[j + 1][1];
         Tegaki.draw(id);
       }
     }
-    Tegaki["recordedPattern_" + id].pop();
+    Tegaki.recordedPattern.pop();
   };
 
   Tegaki.erase = function (id) {
-    Tegaki["ctx_" + id].clearRect(0, 0, Tegaki["w_" + id], Tegaki["h_" + id]);
-    Tegaki["recordedPattern_" + id].length = 0;
+    Tegaki.ctx.clearRect(0, 0, Tegaki.w, Tegaki.h);
+    Tegaki.recordedPattern.length = 0;
   };
 
   Tegaki.find_x_y = function (res, e, id) {
@@ -161,37 +161,37 @@ export function createTegaki(document) {
     if (touch) e.preventDefault(); // prevent scrolling while drawing to the canvas
 
     if (res == "down") {
-      var rect = Tegaki["canvas_" + id].getBoundingClientRect();
-      Tegaki["prevX_" + id] = Tegaki["currX_" + id];
-      Tegaki["prevY_" + id] = Tegaki["currY_" + id];
-      Tegaki["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
-      Tegaki["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
-      Tegaki["currentLine_" + id] = new Array();
-      Tegaki["currentLine_" + id].push([Tegaki["currX_" + id], Tegaki["currY_" + id]]);
+      var rect = Tegaki.canvas.getBoundingClientRect();
+      Tegaki.prevX = Tegaki.currX;
+      Tegaki.prevY = Tegaki.currY;
+      Tegaki.currX = (touch ? touch.clientX : e.clientX) - rect.left;
+      Tegaki.currY = (touch ? touch.clientY : e.clientY) - rect.top;
+      Tegaki.currentLine = new Array();
+      Tegaki.currentLine.push([Tegaki.currX, Tegaki.currY]);
 
-      Tegaki["flagDown_" + id] = true;
-      Tegaki["flagOver_" + id] = true;
-      Tegaki["dot_flag_" + id] = true;
-      if (Tegaki["dot_flag_" + id]) {
-        Tegaki["ctx_" + id].beginPath();
-        Tegaki["ctx_" + id].fillRect(Tegaki["currX_" + id], Tegaki["currY_" + id], 2, 2);
-        Tegaki["ctx_" + id].closePath();
-        Tegaki["dot_flag_" + id] = false;
+      Tegaki.flagDown = true;
+      Tegaki.flagOver = true;
+      Tegaki.dot_flag = true;
+      if (Tegaki.dot_flag) {
+        Tegaki.ctx.beginPath();
+        Tegaki.ctx.fillRect(Tegaki.currX, Tegaki.currY, 2, 2);
+        Tegaki.ctx.closePath();
+        Tegaki.dot_flag = false;
       }
     }
     if (res == "up") {
-      Tegaki["flagDown_" + id] = false;
-      if (Tegaki["flagOver_" + id] == true) {
-        Tegaki["recordedPattern_" + id].push(Tegaki["currentLine_" + id]);
+      Tegaki.flagDown = false;
+      if (Tegaki.flagOver == true) {
+        Tegaki.recordedPattern.push(Tegaki.currentLine);
       }
     }
 
     if (res == "out") {
-      Tegaki["flagOver_" + id] = false;
-      if (Tegaki["flagDown_" + id] == true) {
-        Tegaki["recordedPattern_" + id].push(Tegaki["currentLine_" + id]);
+      Tegaki.flagOver = false;
+      if (Tegaki.flagDown == true) {
+        Tegaki.recordedPattern.push(Tegaki.currentLine);
       }
-      Tegaki["flagDown_" + id] = false;
+      Tegaki.flagDown = false;
     }
 
     /*
@@ -200,60 +200,60 @@ export function createTegaki(document) {
 	*/
 
     if (res == "move") {
-      if (Tegaki["flagOver_" + id] && Tegaki["flagDown_" + id]) {
-        var rect = Tegaki["canvas_" + id].getBoundingClientRect();
-        Tegaki["prevX_" + id] = Tegaki["currX_" + id];
-        Tegaki["prevY_" + id] = Tegaki["currY_" + id];
-        Tegaki["currX_" + id] = (touch ? touch.clientX : e.clientX) - rect.left;
-        Tegaki["currY_" + id] = (touch ? touch.clientY : e.clientY) - rect.top;
-        Tegaki["currentLine_" + id].push([Tegaki["prevX_" + id], Tegaki["prevY_" + id]]);
-        Tegaki["currentLine_" + id].push([Tegaki["currX_" + id], Tegaki["currY_" + id]]);
+      if (Tegaki.flagOver && Tegaki.flagDown) {
+        var rect = Tegaki.canvas.getBoundingClientRect();
+        Tegaki.prevX = Tegaki.currX;
+        Tegaki.prevY = Tegaki.currY;
+        Tegaki.currX = (touch ? touch.clientX : e.clientX) - rect.left;
+        Tegaki.currY = (touch ? touch.clientY : e.clientY) - rect.top;
+        Tegaki.currentLine.push([Tegaki.prevX, Tegaki.prevY]);
+        Tegaki.currentLine.push([Tegaki.currX, Tegaki.currY]);
         Tegaki.draw(id);
       }
     }
   };
 
   // redraw to current canvas according to
-  // what is currently stored in Tegaki["recordedPattern_" + id]
+  // what is currently stored in Tegaki.recordedPattern
   // add numbers to each stroke
   Tegaki.redraw = function (id) {
-    Tegaki["ctx_" + id].clearRect(0, 0, Tegaki["w_" + id], Tegaki["h_" + id]);
+    Tegaki.ctx.clearRect(0, 0, Tegaki.w, Tegaki.h);
 
     // draw strokes
-    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
-      var stroke_i = Tegaki["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki.recordedPattern.length; i++) {
+      var stroke_i = Tegaki.recordedPattern[i];
 
       for (var j = 0; j < stroke_i.length - 1; j++) {
-        Tegaki["prevX_" + id] = stroke_i[j][0];
-        Tegaki["prevY_" + id] = stroke_i[j][1];
+        Tegaki.prevX = stroke_i[j][0];
+        Tegaki.prevY = stroke_i[j][1];
 
-        Tegaki["currX_" + id] = stroke_i[j + 1][0];
-        Tegaki["currY_" + id] = stroke_i[j + 1][1];
+        Tegaki.currX = stroke_i[j + 1][0];
+        Tegaki.currY = stroke_i[j + 1][1];
         Tegaki.draw(id, Tegaki.strokeColors[i]);
       }
     }
 
     // draw stroke numbers
-    if (Tegaki["canvas_" + id].dataset.strokeNumbers != "false") {
-      for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
-        var stroke_i = Tegaki["recordedPattern_" + id][i],
+    if (Tegaki.canvas.dataset.strokeNumbers != "false") {
+      for (var i = 0; i < Tegaki.recordedPattern.length; i++) {
+        var stroke_i = Tegaki.recordedPattern[i],
           x = stroke_i[Math.floor(stroke_i.length / 2)][0] + 5,
           y = stroke_i[Math.floor(stroke_i.length / 2)][1] - 5;
 
-        Tegaki["ctx_" + id].font = "20px Arial";
+        Tegaki.ctx.font = "20px Arial";
 
         // outline
-        Tegaki["ctx_" + id].lineWidth = 3;
-        Tegaki["ctx_" + id].strokeStyle = Tegaki.alterHex(
+        Tegaki.ctx.lineWidth = 3;
+        Tegaki.ctx.strokeStyle = Tegaki.alterHex(
           Tegaki.strokeColors[i] ? Tegaki.strokeColors[i] : "#333333",
           60,
           "dec",
         );
-        Tegaki["ctx_" + id].strokeText((i + 1).toString(), x, y);
+        Tegaki.ctx.strokeText((i + 1).toString(), x, y);
 
         // fill
-        Tegaki["ctx_" + id].fillStyle = Tegaki.strokeColors[i] ? Tegaki.strokeColors[i] : "#333";
-        Tegaki["ctx_" + id].fillText((i + 1).toString(), x, y);
+        Tegaki.ctx.fillStyle = Tegaki.strokeColors[i] ? Tegaki.strokeColors[i] : "#333";
+        Tegaki.ctx.fillText((i + 1).toString(), x, y);
       }
     }
   };
@@ -287,7 +287,7 @@ export function createTegaki(document) {
     return "#" + color.join("");
   };
 
-  // linear normalization for Tegaki["recordedPattern_" + id]
+  // linear normalization for Tegaki.recordedPattern
   Tegaki.normalizeLinear = function (id) {
     var normalizedPattern = new Array();
     Tegaki.newHeight = 256;
@@ -297,8 +297,8 @@ export function createTegaki(document) {
     Tegaki.yMin = 256;
     Tegaki.yMax = 0;
     // first determine drawn character width / length
-    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
-      var stroke_i = Tegaki["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki.recordedPattern.length; i++) {
+      var stroke_i = Tegaki.recordedPattern[i];
       for (var j = 0; j < stroke_i.length; j++) {
         Tegaki.x = stroke_i[j][0];
         Tegaki.y = stroke_i[j][1];
@@ -319,8 +319,8 @@ export function createTegaki(document) {
     Tegaki.oldHeight = Math.abs(Tegaki.yMax - Tegaki.yMin);
     Tegaki.oldWidth = Math.abs(Tegaki.xMax - Tegaki.xMin);
 
-    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
-      var stroke_i = Tegaki["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki.recordedPattern.length; i++) {
+      var stroke_i = Tegaki.recordedPattern[i];
       var normalized_stroke_i = new Array();
       for (var j = 0; j < stroke_i.length; j++) {
         Tegaki.x = stroke_i[j][0];
@@ -331,7 +331,7 @@ export function createTegaki(document) {
       }
       normalizedPattern.push(normalized_stroke_i);
     }
-    Tegaki["recordedPattern_" + id] = normalizedPattern;
+    Tegaki.recordedPattern = normalizedPattern;
     Tegaki.redraw(id);
   };
 
@@ -461,8 +461,8 @@ export function createTegaki(document) {
     Tegaki.yMin = 256;
     Tegaki.yMax = 0;
     // first determine drawn character width / length
-    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
-      var stroke_i = Tegaki["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki.recordedPattern.length; i++) {
+      var stroke_i = Tegaki.recordedPattern[i];
       for (var j = 0; j < stroke_i.length; j++) {
         Tegaki.x = stroke_i[j][0];
         Tegaki.y = stroke_i[j][1];
@@ -497,9 +497,9 @@ export function createTegaki(document) {
     var xOffset = (Tegaki.newWidth - aranWidth) / 2;
     var yOffset = (Tegaki.newHeight - aranHeight) / 2;
 
-    var m00_ = Tegaki.m00(Tegaki["recordedPattern_" + id]);
-    var m01_ = Tegaki.m01(Tegaki["recordedPattern_" + id]);
-    var m10_ = Tegaki.m10(Tegaki["recordedPattern_" + id]);
+    var m00_ = Tegaki.m00(Tegaki.recordedPattern);
+    var m01_ = Tegaki.m01(Tegaki.recordedPattern);
+    var m10_ = Tegaki.m10(Tegaki.recordedPattern);
 
     var xc_ = m10_ / m00_;
     var yc_ = m01_ / m00_;
@@ -507,15 +507,15 @@ export function createTegaki(document) {
     var xc_half = aranWidth / 2;
     var yc_half = aranHeight / 2;
 
-    var mu20_ = Tegaki.mu20(Tegaki["recordedPattern_" + id], xc_);
-    var mu02_ = Tegaki.mu02(Tegaki["recordedPattern_" + id], yc_);
+    var mu20_ = Tegaki.mu20(Tegaki.recordedPattern, xc_);
+    var mu02_ = Tegaki.mu02(Tegaki.recordedPattern, yc_);
 
     var alpha = aranWidth / (4 * Math.sqrt(mu20_ / m00_)) || 0;
     var beta = aranHeight / (4 * Math.sqrt(mu02_ / m00_)) || 0;
 
     var nf = new Array();
-    for (var i = 0; i < Tegaki["recordedPattern_" + id].length; i++) {
-      var si = Tegaki["recordedPattern_" + id][i];
+    for (var i = 0; i < Tegaki.recordedPattern.length; i++) {
+      var si = Tegaki.recordedPattern[i];
       var nsi = new Array();
       for (var j = 0; j < si.length; j++) {
         var newX = alpha * (si[j][0] - xc_) + xc_half;
@@ -581,8 +581,8 @@ export function createTegaki(document) {
 
   /* test extraction function
    Tegaki.extractTest = function () {
-      //var ex = Tegaki.extractFeatures(Tegaki["recordedPattern_" + id], 20.);
-	  //Tegaki["recordedPattern_" + id] = ex;
+      //var ex = Tegaki.extractFeatures(Tegaki.recordedPattern, 20.);
+	  //Tegaki.recordedPattern = ex;
 
       //Tegaki.redraw(id);
 
@@ -1015,8 +1015,8 @@ export function createTegaki(document) {
     Tegaki.redraw(id);
 
     // display candidates in the specified element
-    if (Tegaki["canvas_" + id].dataset.candidateList) {
-      document.getElementById(Tegaki["canvas_" + id].dataset.candidateList).innerHTML = Tegaki.fineClassification(
+    if (Tegaki.canvas.dataset.candidateList) {
+      document.getElementById(Tegaki.canvas.dataset.candidateList).innerHTML = Tegaki.fineClassification(
         extractedFeatures,
         candidates,
       );
@@ -1030,9 +1030,9 @@ export function createTegaki(document) {
 
   /* test moment normalization
 	function MomentTest() {
-	  Tegaki["recordedPattern_" + id] = test4;
+	  Tegaki.recordedPattern = test4;
 	  var mn = Tegaki.momentNormalize(id);
-	  Tegaki["recordedPattern_" + id] = mn;
+	  Tegaki.recordedPattern = mn;
 	  console.log(mn);
 	  Tegaki.redraw(id);
 
@@ -1045,11 +1045,11 @@ export function createTegaki(document) {
   Tegaki.copyStuff = function (id) {
     Tegaki.s = "";
 
-    for (var i = 0, j = Tegaki["recordedPattern_" + id].length; i < j; i++) {
-      console.log(i + 1, Tegaki["recordedPattern_" + id][i], Tegaki["recordedPattern_" + id][i].toString());
-      console.log(Tegaki["recordedPattern_" + id][i]);
-      console.log(JSON.stringify(Tegaki["recordedPattern_" + id][i]));
-      Tegaki.s += "[" + JSON.stringify(Tegaki["recordedPattern_" + id][i]) + "],";
+    for (var i = 0, j = Tegaki.recordedPattern.length; i < j; i++) {
+      console.log(i + 1, Tegaki.recordedPattern[i], Tegaki.recordedPattern[i].toString());
+      console.log(Tegaki.recordedPattern[i]);
+      console.log(JSON.stringify(Tegaki.recordedPattern[i]));
+      Tegaki.s += "[" + JSON.stringify(Tegaki.recordedPattern[i]) + "],";
     }
 
     Tegaki.copyToClipboard(Tegaki.s);
@@ -1068,7 +1068,7 @@ export function createTegaki(document) {
   document.addEventListener("keydown", function (e) {
     var id = document.activeElement.id;
 
-    if (Tegaki["canvas_" + id] && e.ctrlKey) {
+    if (Tegaki.canvas && e.ctrlKey) {
       switch (e.key.toLowerCase()) {
         // undo
         case "z":
