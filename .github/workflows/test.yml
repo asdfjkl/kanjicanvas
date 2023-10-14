@@ -20,7 +20,7 @@ jobs:
       - name: check spells
         run: pnpm run spell-check
       - name: check formats
-        run: pnpm run fmt .
+        run: pnpm run fmt . --check
       - name: check lint
         run: pnpm run lint .
       - name: build
