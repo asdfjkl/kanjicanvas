@@ -1,0 +1,17 @@
+{
+  "name": "ocr-ts",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "",
+  "keywords": [],
+  "author": "Ubugeeei <ubuge1122@gmail.com>",
+  "license": "MIT",
+  "config": {
+    "commitizen": {
+      "path": "git-cz"
+    }
+  },
+  "volta": {
+    "node": "18.18.2"
+  }
+}
