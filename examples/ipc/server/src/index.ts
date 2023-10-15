@@ -21,7 +21,7 @@ app.post("/recognize", async c => {
 
 app.post("/recognize-encoded", async c => {
   const req = await c.req.json();
-  console.log(`size: ${req.strokes.length} bytes`);
+  console.log(`size: ${req.strokes.length} bytes (encoded)`);
   const strokes = decodeStroke(req.strokes);
   if (strokes instanceof DecodeError) {
     return c.json({ error: strokes.message });
