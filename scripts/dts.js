@@ -22,12 +22,15 @@ const getTargetFiles = pathList =>
   pathList.map(it => {
     const rooted = it.replace(/^temp\//, "");
     const dist_ed = rooted.replace(/\/src\//, `/${/^packages\/cli\/+/.test(rooted) ? "bin" : "dist"}/`);
-    const flattened = dist_ed.split("/").reduce((acc, cur, i) => {
-      if (i === 0) return acc + cur;
-      if ([1, 2].includes(i)) return acc + "/" + cur + "/";
-      if (i === dist_ed.split("/").length - 1) return acc + cur;
-      return acc + cur + "-";
-    }, "");
+    const flattened = dist_ed
+      .split("/")
+      .reduce((acc, cur, i) => {
+        if (i === 0) return acc + cur;
+        if ([1, 2].includes(i)) return acc + "/" + cur + "/";
+        if (i === dist_ed.split("/").length - 1) return acc + cur;
+        return acc + cur + "-";
+      }, "")
+      .replace("//", "/");
     return flattened;
   });
 
