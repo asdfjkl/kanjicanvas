@@ -6,10 +6,11 @@ import path from "path";
  */
 await esbuild.build({
   entryPoints: [
+    path.resolve("packages/tegaki/index"),
     path.resolve("packages/frontend/index"),
     path.resolve("packages/backend/index"),
     path.resolve("packages/dataset/index"),
-    path.resolve("packages/tegaki/index"),
+    path.resolve("packages/utils/index"),
   ],
   bundle: true,
   outdir: "dist",
