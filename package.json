@@ -11,19 +11,26 @@
       "path": "git-cz"
     }
   },
+  "packageManager": "pnpm@8.9.0",
+  "engines": {
+    "node": ">=16.15.0",
+    "pnpm": "8.9.0",
+    "npm": "please_use_pnpm_instead"
+  },
+  "volta": {
+    "node": "18.18.2"
+  },
   "scripts": {
     "prepare": "husky install",
-    "build": "pnpm run bundle && pnpm run build:types",
+    "build": "pnpm run bundle && pnpm run build:dts",
     "bundle": "node scripts/build.js",
-    "build:types": "tsc --project tsconfig.json",
+    "build:dts": "tsc -p tsconfig.build.json && node scripts/dts.js",
     "fmt": "prettier",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "spell-check": "cspell lint \"**\" --no-progress --show-suggestions --show-context --cache",
     "play": "cd examples/_basic && pnpm run dev"
   },
   "devDependencies": {
-    "@types/adm-zip": "^0.5.2",
-    "@types/node": "^20.8.6",
     "cspell": "^7.3.8",
     "esbuild": "^0.19.4",
     "eslint": "^8.51.0",
@@ -32,13 +39,5 @@
     "prettier": "^3.0.3",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
-  },
-  "volta": {
-    "node": "18.18.2"
-  },
-  "dependencies": {
-    "adm-zip": "^0.5.10",
-    "citty": "^0.1.4",
-    "consola": "^3.2.3"
   }
 }
