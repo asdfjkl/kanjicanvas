@@ -23,7 +23,7 @@
     "prepare": "husky install",
     "build": "pnpm run bundle && pnpm run build:dts",
     "bundle": "node scripts/build.js",
-    "build:dts": "tsc -p tsconfig.build.json && node scripts/dts.js",
+    "build:dts": "rm -rf temp && tsc -p tsconfig.build.json && node scripts/dts.js && rm -rf temp",
     "fmt": "prettier",
     "lint": "ESLINT_USE_FLAT_CONFIG=true eslint",
     "spell-check": "cspell lint \"**\" --no-progress --show-suggestions --show-context --cache",

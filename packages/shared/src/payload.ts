@@ -1,4 +1,4 @@
-import { Stroke } from "tegaki";
+import { Stroke } from "./stroke";
 import { hexToNumber, numberToHex } from "./general";
 
 export const STROKE_SEPARATOR = "\n";

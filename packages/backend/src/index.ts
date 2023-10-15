@@ -1,4 +1,4 @@
-import type { Position, Stroke, TegakiStroke } from "tegaki";
+import type { Position, Stroke, TegakiStroke } from "@tegaki/shared";
 
 type M10 = (pattern: Array<Stroke>) => number;
 type M01 = (pattern: Array<Stroke>) => number;

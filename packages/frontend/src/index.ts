@@ -1,4 +1,4 @@
-import type { Stroke } from "tegaki";
+import type { Stroke } from "@tegaki/shared";
 import { CanvasCtxNotFoundError, InitializeError } from "./errors";
 
 // TODO: private properties
