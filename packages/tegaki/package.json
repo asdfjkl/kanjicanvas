@@ -1,0 +1,12 @@
+{
+  "name": "tegaki",
+  "version": "0.0.1",
+  "description": "tegaki is a simple drawing library for the web.",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ubugeeei <ubuge1122@gmail.com>",
+  "license": "ISC"
+}

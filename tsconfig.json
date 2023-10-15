@@ -3,18 +3,17 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "node",
-    "outDir": "dist",
-    "emitDeclarationOnly": true,
-    "declarationDir": "dist/types",
-    "declaration": true,
+    "outDir": "temp",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "allowJs": true,
+    "rootDir": ".",
     "paths": {
-      "@tegaki/*": ["./packages/*"]
+      "@tegaki/*": ["./packages/*/src"],
+      "tegaki": ["./packages/tegaki/src"]
     }
   },
-  "include": ["./packages/**/*.ts"]
+  "include": ["./packages/**/src/*.ts"]
 }

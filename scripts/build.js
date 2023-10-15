@@ -1,43 +1,81 @@
-import path from "path";
-
+import fs from "node:fs";
+import path from "node:path";
 import * as esbuild from "esbuild";
 import { rimraf } from "rimraf";
 
-const OUT_DIR = "dist";
+/** @type {(str: string) => string} */
+const blue = str => `\x1b[34m${str}\x1b[0m`;
 
-// cleanup dist
-rimraf.sync(OUT_DIR);
+/** @type {(str: string) => string} */
+const green = str => `\x1b[32m${str}\x1b[0m`;
 
-/**
- * @type {import('esbuild').BuildOptions}
- */
-await esbuild.build({
-  entryPoints: [
-    path.resolve("packages/tegaki/index"),
-    path.resolve("packages/frontend/index"),
-    path.resolve("packages/backend/index"),
-    path.resolve("packages/dataset/index"),
-    path.resolve("packages/utils/index"),
-  ],
-  bundle: true,
-  outdir: OUT_DIR,
-});
+const CLI_OUT_DIR = `packages/cli/bin`;
 
 /**
- * @type {import('esbuild').BuildOptions}
+ * @type {() => PromiseLike<void>}
  */
-await esbuild.build({
-  entryPoints: [path.resolve("packages/cli/bin")],
-  bundle: true,
-  outdir: `${OUT_DIR}/cli`,
-  target: "node18",
-  platform: "node",
-  outExtension: { ".js": ".cjs" },
-});
+export const buildCli = async () => {
+  /**
+   * @type {import('esbuild').BuildOptions}
+   */
+  await esbuild.build({
+    entryPoints: [path.resolve("packages/cli/src/bin")],
+    bundle: true,
+    outdir: CLI_OUT_DIR,
+    target: "node18",
+    platform: "node",
+    outExtension: { ".js": ".cjs" },
+  });
+  console.log(`${green("✔︎")} finished build: ${blue(CLI_OUT_DIR)}`);
 
-// copy jTegaki.zip
-import fs from "fs";
-fs.copyFileSync(path.resolve("packages/cli/cmd/jTegaki/jTegaki.zip"), path.resolve(`${OUT_DIR}/cli/jTegaki.zip`));
+  // copy jTegaki.zip
+  fs.copyFileSync(path.resolve("packages/cli/src/cmd/jTegaki/jTegaki.zip"), path.resolve(`${CLI_OUT_DIR}/jTegaki.zip`));
+  console.log(`${green("✔︎")} finished build: ${blue(`${CLI_OUT_DIR}/jTegaki.zip`)}`);
 
-// copy python
-fs.copyFileSync(path.resolve("packages/cli/cmd/datagen/datagen.py"), path.resolve(`${OUT_DIR}/cli/datagen.py`));
+  // copy python script
+  fs.copyFileSync(path.resolve("packages/cli/src/cmd/datagen/datagen.py"), path.resolve(`${CLI_OUT_DIR}/datagen.py`));
+  console.log(`${green("✔︎")} finished build: ${blue(`${CLI_OUT_DIR}/datagen.py`)}`);
+};
+
+/**
+ * @type {() => void}
+ */
+export const clearCliSync = () => {
+  rimraf.sync(CLI_OUT_DIR);
+};
+
+const PACKAGES = ["tegaki", "frontend", "backend", "dataset", "shared"];
+
+/**
+ * @type {() => PromiseLike<import('esbuild').BuildResult<{ entryPoints: string, outdir: string }>>[]}
+ */
+export const buildTegaki = () =>
+  PACKAGES.map(pkg => {
+    /**
+     * @type {import('esbuild').BuildOptions}
+     */
+    const res = esbuild.build({
+      entryPoints: [path.resolve(`packages/${pkg}/src/index`)],
+      bundle: true,
+      outdir: `packages/${pkg}/dist`,
+    });
+    res.then(() => console.log(`${green("✔︎")} finished build: ${blue(`packages/${pkg}/dist`)}`));
+    return res;
+  });
+
+/**
+ * @type {function(): void}
+ */
+export const clearTegakiSync = () => {
+  PACKAGES.map(pkg => `packages/${pkg}/dist`).forEach(dir => rimraf.sync(dir));
+};
+
+(async function main() {
+  console.log("clear dist...");
+  await Promise.allSettled([clearCliSync(), clearTegakiSync()]);
+  console.log(`${green("✔︎")} finished clearing dist`);
+  console.log("building tegaki...");
+  const buildingTegaki = buildTegaki();
+  const buildingCli = buildCli();
+  await Promise.all([...buildingTegaki, buildingCli]);
+})();

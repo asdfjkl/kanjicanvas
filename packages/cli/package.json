@@ -1,0 +1,17 @@
+{
+  "name": "@tegaki/cli",
+  "version": "0.0.1",
+  "description": "@tegaki/cli",
+  "bin": "./bin/bin.cjs",
+  "author": "Ubugeeei <ubuge1122@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "citty": "^0.1.4",
+    "consola": "^3.2.3"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.2",
+    "@types/node": "^20.8.6"
+  }
+}
