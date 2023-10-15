@@ -11,10 +11,9 @@
       "path": "git-cz"
     }
   },
-  "packageManager": "pnpm@8.9.0",
   "engines": {
     "node": ">=16.15.0",
-    "pnpm": "8.9.0",
+    "pnpm": "8",
     "npm": "please_use_pnpm_instead"
   },
   "volta": {
