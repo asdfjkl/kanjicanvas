@@ -2,7 +2,9 @@
   "name": "@tegaki/cli",
   "version": "0.0.1",
   "description": "@tegaki/cli",
-  "bin": "./bin/bin.cjs",
+  "bin": {
+    "tegaki": "./bin/bin.cjs"
+  },
   "author": "Ubugeeei <ubuge1122@gmail.com>",
   "license": "MIT",
   "dependencies": {
