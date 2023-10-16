@@ -30,6 +30,7 @@ module.exports = {
   ],
   ignorePaths: [
     "**/dist/*",
+    "**/bin/*",
     "**/node_modules/*",
     "**/.git/*",
     "**/.gitignore",

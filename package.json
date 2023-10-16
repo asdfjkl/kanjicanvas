@@ -29,12 +29,20 @@
     "spell-check": "cspell lint \"**\" --no-progress --show-suggestions --show-context --cache",
     "play": "cd examples/_basic && pnpm run dev"
   },
+  "lint-staged": {
+    "*": [
+      "pnpm run spell-check",
+      "pnpm run fmt --check",
+      "pnpm run lint"
+    ]
+  },
   "devDependencies": {
     "cspell": "^7.3.8",
     "esbuild": "^0.19.4",
     "eslint": "^8.51.0",
     "eslint-config-prettier": "^9.0.0",
     "husky": "^8.0.3",
+    "lint-staged": "^15.0.1",
     "prettier": "^3.0.3",
     "rimraf": "^5.0.5",
     "typescript": "^5.2.2"
