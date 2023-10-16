@@ -8,6 +8,8 @@ const blue = str => `\x1b[34m${str}\x1b[0m`;
 /** @type {(str: string) => string} */
 const green = str => `\x1b[32m${str}\x1b[0m`;
 
+const generated = dir => console.log(`${green("✔︎")} generate: ${blue(dir)}`);
+
 const getPaths = dir =>
   fs
     .readdirSync(dir, { withFileTypes: true })
@@ -37,7 +39,7 @@ const getTargetFiles = pathList =>
 const copyFiles = (sourceList, targetList) => {
   sourceList.forEach((source, i) => {
     fs.copyFileSync(source, targetList[i]);
-    console.log(`${green("✔︎")} generated: ${blue(targetList[i])}`);
+    generated(targetList[i]);
   });
 };
 

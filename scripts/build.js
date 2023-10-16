@@ -9,6 +9,9 @@ const blue = str => `\x1b[34m${str}\x1b[0m`;
 /** @type {(str: string) => string} */
 const green = str => `\x1b[32m${str}\x1b[0m`;
 
+/** @type {(dir: string) => void} */
+const finishedBuild = dir => console.log(`${green("✔︎")} build: ${blue(dir)}`);
+
 const CLI_OUT_DIR = `packages/cli/bin`;
 
 /**
@@ -25,15 +28,15 @@ export const buildCli = async () => {
     target: "node18",
     platform: "node",
   });
-  console.log(`${green("✔︎")} finished build: ${blue(CLI_OUT_DIR)}`);
+  finishedBuild(CLI_OUT_DIR);
 
   // copy jTegaki.zip
   fs.copyFileSync(path.resolve("packages/cli/src/cmd/jTegaki/jTegaki.zip"), path.resolve(`${CLI_OUT_DIR}/jTegaki.zip`));
-  console.log(`${green("✔︎")} finished build: ${blue(`${CLI_OUT_DIR}/jTegaki.zip`)}`);
+  finishedBuild(`${CLI_OUT_DIR}/jTegaki.zip)`);
 
   // copy python script
   fs.copyFileSync(path.resolve("packages/cli/src/cmd/datagen/datagen.py"), path.resolve(`${CLI_OUT_DIR}/datagen.py`));
-  console.log(`${green("✔︎")} finished build: ${blue(`${CLI_OUT_DIR}/datagen.py`)}`);
+  finishedBuild(`${CLI_OUT_DIR}/datagen.py)`);
 };
 
 /**
@@ -58,7 +61,7 @@ export const buildTegaki = () =>
       bundle: true,
       outdir: `packages/${pkg}/dist`,
     });
-    res.then(() => console.log(`${green("✔︎")} finished build: ${blue(`packages/${pkg}/dist`)}`));
+    res.then(() => finishedBuild(`packages/${pkg}/dist`));
     return res;
   });
 
