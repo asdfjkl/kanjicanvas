@@ -24,7 +24,6 @@ export const buildCli = async () => {
     outdir: CLI_OUT_DIR,
     target: "node18",
     platform: "node",
-    outExtension: { ".js": ".cjs" },
   });
   console.log(`${green("✔︎")} finished build: ${blue(CLI_OUT_DIR)}`);
 

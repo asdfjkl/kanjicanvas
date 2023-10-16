@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "@tegaki/cli",
   "bin": {
-    "tegaki": "./bin/bin.cjs"
+    "tegaki": "./bin/bin.js"
   },
   "author": "Ubugeeei <ubuge1122@gmail.com>",
   "license": "MIT",
