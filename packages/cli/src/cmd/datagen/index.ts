@@ -49,7 +49,6 @@ const getPythonCmd = async (): Promise<"python" | "python3" | null> => {
     return "python";
   } catch (err) {
     try {
-      // pythonが見つからない場合、python3を探す
       const { stdout } = exec(`which python3`);
       if (stdout) {
         return "python3";
