@@ -96,7 +96,7 @@ KanjiCanvas.refPatterns = [
 
 ## Copyright and License
 
-Copyright (c) 2019-2020 Dominik Klein
+Copyright (c) 2019-2024 Dominik Klein
 
 Copyright (c) 2020 Seth Clydesdale
 
