@@ -77,6 +77,8 @@ If `data-candidate-list` is not specified, the results are returned as a string 
 
 
 ### Adding New refPatterns
+[kanjivg_refPatterns.js](https://github.com/alexander-kohler/kanjicanvas/blob/master/kanjivg_refPatterns.js) contains all the characters from the KanjiVG project, including Kana. Kana entries can pollute the search results somewhat, so consider leaving them out.
+
 To add new refPatterns you must download [jTegaki](https://github.com/asdfjkl/kanjicanvas/files/4936570/jTegaki.zip) and follow the steps below. 
 
 1. If you need a guide to help draw your desired character, go to **Option > set background** and enter the unicode value for the character. You can use an online tool such as [this](https://r12a.github.io/app-conversion/) to get the unicode value. (it'll be under Hex/UTF-32)
